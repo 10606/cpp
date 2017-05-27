@@ -20,7 +20,7 @@ big_integer::big_integer (big_integer const & a)
 {
     size = a.size;
     signed_ = a.signed_;
-    data = big_obj(a.data.capacity);
+    data = big_obj(a.size);
     for (size_t i = 0; i != size; ++i)
         data.data[i] = a.data.data[i];
 }

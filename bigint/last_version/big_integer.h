@@ -17,13 +17,10 @@ public:
     struct big_obj
     {
         uint32_t * data;
-        size_t capacity;
         big_obj():
-            data(nullptr), 
-            capacity(0)
+            data(nullptr)
         {}
-        big_obj(size_t capacity_): 
-            capacity(capacity_)
+        big_obj(size_t capacity_) 
         {
             data = new uint32_t [capacity_];
             memset(data, 0, capacity_ * 4);
