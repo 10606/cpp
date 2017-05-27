@@ -96,6 +96,10 @@ status build_tree(char * in)
         {
             if (tree[v].left == -1)
                 tree[v].right = 0xff & static_cast <int32_t> (in[c_pos++]);
+            if (tree[v].parent == -1)
+            {
+                throw;
+            }
             v = tree[v].parent;
         }
     }
