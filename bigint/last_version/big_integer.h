@@ -68,10 +68,10 @@ private:
     static bool comp_fbe(big_integer const & a, big_integer const & b); 
     static bool comp_fb(big_integer const & a, big_integer const & b);
     
-    static inline big_integer bin_bb(big_integer const & a, big_integer const & b, uint32_t (*func) (uint32_t, uint32_t)); 
-    static inline uint32_t func_or (uint32_t a_, uint32_t b_);
-    static inline uint32_t func_and (uint32_t a_, uint32_t b_);
-    static inline uint32_t func_xor (uint32_t a_, uint32_t b_);
+    static inline big_integer bin_bb(big_integer const & a, big_integer const & b, uint32_t (*func) (uint32_t const &, uint32_t const &)); 
+    static inline uint32_t func_or (uint32_t const & a_, uint32_t const & b_);
+    static inline uint32_t func_and (uint32_t const & a_, uint32_t const & b_);
+    static inline uint32_t func_xor (uint32_t const & a_, uint32_t const & b_);
     
     static inline std::string bi_to_string(big_integer s);
     static inline big_integer string_to_bi(std::string const & s);

@@ -499,7 +499,7 @@ inline big_integer & big_integer::inc_prefix(big_integer & a)
         return a;
     }
 }
-inline big_integer big_integer::bin_bb(big_integer const & a, big_integer const & b, uint32_t (*func) (uint32_t, uint32_t)) 
+inline big_integer big_integer::bin_bb(big_integer const & a, big_integer const & b, uint32_t (*func) (uint32_t const &, uint32_t const &)) 
 {
     big_integer res;
     size_t max_size = std::max(a.size, b.size);
@@ -549,15 +549,15 @@ std::string to_string(big_integer const & ss)
         res = "-" + res;
     return res;
 }
-inline uint32_t big_integer::func_or (uint32_t a_, uint32_t b_) 
+inline uint32_t big_integer::func_or (uint32_t const & a_, uint32_t const & b_) 
 {
     return a_ | b_;
 }
-inline uint32_t big_integer::func_and (uint32_t a_, uint32_t b_) 
+inline uint32_t big_integer::func_and (uint32_t const & a_, uint32_t const & b_) 
 {
     return a_ & b_;
 }
-inline uint32_t big_integer::func_xor (uint32_t a_, uint32_t b_) 
+inline uint32_t big_integer::func_xor (uint32_t const & a_, uint32_t const & b_) 
 {
     return a_ ^ b_;
 }
