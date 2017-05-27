@@ -1,0 +1,3 @@
+/home/wa51/code/code_sorokin/asm_sub/CMakeFiles/rebuild_cache.dir
+/home/wa51/code/code_sorokin/asm_sub/CMakeFiles/edit_cache.dir
+/home/wa51/code/code_sorokin/asm_sub/CMakeFiles/sub.dir
