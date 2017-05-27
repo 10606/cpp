@@ -79,9 +79,9 @@ inline std::pair<uint32_t, uint32_t> const big_integer::mul(uint32_t const & a, 
 }
 inline bool big_integer::check_resize_bb(big_integer const & a, big_integer const & b)
 {
-    if (b.data.data[b.size - 1] < c11_ && b.data.data[b.size - 1] >= c01_)
+    if (b.data.data[b.size - 1] >= c01_)
         return 1;
-    if (a.data.data[b.size - 1] < c11_ && a.data.data[b.size - 1] >= c01_)
+    if (a.data.data[b.size - 1] >= c01_)
         return 1;
     return 0;
 }
