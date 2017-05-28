@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <memory>
 #include <cstdlib>
 #include <stdint.h>
 #include <set>
@@ -57,7 +58,7 @@ void get_lengths(size_t pos, size_t lenghts)
     get_lengths(tree[pos].right, lenghts + 1);
 }
 
-void print_tree (size_t v,  char  * to, size_t & pos_char, size_t & pos, size_t & ind_pos)
+void print_tree (size_t v,  /*std::shared_ptr <char>*/ char * to, size_t & pos_char, size_t & pos, size_t & ind_pos)
 {
     if (tree[v].left == -1)
     {
@@ -72,7 +73,7 @@ void print_tree (size_t v,  char  * to, size_t & pos_char, size_t & pos, size_t 
     set_bit(0, to, pos, ind_pos);
 }
 
-status build_tree(char * in)
+void build_tree(char * in)
 {
     tree.clear();
     tree.push_back(bin_tree(-1, -1, -1));
@@ -103,14 +104,9 @@ status build_tree(char * in)
             v = tree[v].parent;
         }
     }
-    status ans;
-    ans.ans = 0;
-    ans.size = 0;
-    ans.pos = 0;
-    return ans;
 }
 
-status build_tree(std::vector <size_t> freq_)
+tree_e build_tree(std::vector <size_t> freq_)
 {
     freq = freq_;
     tree.clear();
@@ -134,17 +130,14 @@ status build_tree(std::vector <size_t> freq_)
     size_t pos, ind_pos;
     get_lengths(tree.size() - 1, 0);
     size_t out_size = max_char + 128;
-    char * out = static_cast <char *> (operator new (out_size));
-    memset(out, 0, out_size);
+    tree_e out (out_size);
+    out.size = out_size;
+    memset(out.tree, 0, out_size);
     pos = max_char;
     size_t pos_c = 0;
     ind_pos = 0;
-    print_tree(tree.size() - 1, out, pos_c, pos, ind_pos);
-    status ans;
-    ans.pos = 0;
-    ans.ans = out;
-    ans.size = out_size;
-    return ans;
+    print_tree(tree.size() - 1, out.tree, pos_c, pos, ind_pos);
+    return out;
 }
 
 status encode(status a)

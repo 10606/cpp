@@ -7,8 +7,8 @@
 #include "status.h"
 extern status encode (status);
 extern status decode (status);
-extern status build_tree (std::vector <size_t>);
-extern status build_tree (char *);
+extern tree_e build_tree (std::vector <size_t>);
+extern void build_tree (char *);
 const size_t size_block = 10000;
 char input[(size_block + 2) * 256];
 char output[(size_block + 2) * 256];
@@ -97,9 +97,9 @@ int encode_file (int argc, char ** argv)
     status a;
     try
     {
-        a = build_tree(freq);
-        out.write(a.ans, a.size);
-        operator delete (a.ans);
+        tree_e tree(build_tree(freq));
+        out.write(tree.tree, tree.size);
+        //operator delete (a.ans);
     }
     catch(...)
     {

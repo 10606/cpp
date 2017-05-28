@@ -1,5 +1,20 @@
 #ifndef STATUS_H
 #define STATUS_H
+#include <memory>
+struct tree_e
+{
+    char * tree;
+    size_t size;
+    tree_e (size_t size_):
+        size(size_)
+    {
+        tree = new char [size];
+    }
+    ~tree_e ()
+    {
+        delete [] tree;
+    }
+};
 struct status
 {
     size_t pos;
@@ -30,8 +45,8 @@ public:
         pos_rem_e(0)
     {}
 
-    friend status build_tree(char * in);
-    friend status build_tree(std::vector <size_t> freq_);
+    friend void build_tree(char * in);
+    friend tree_e build_tree(std::vector <size_t> freq_);
     friend status encode(status a);
     friend status decode (status a);
 };
