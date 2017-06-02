@@ -47,6 +47,8 @@ big_integer::big_integer (std::string s):
 }
 big_integer & big_integer::operator = (big_integer const & a)
 {
+    swap(a);
+    /*
     if (a.data.data == data.data)
         return *this;
     if (size > 0)
@@ -56,6 +58,7 @@ big_integer & big_integer::operator = (big_integer const & a)
     signed_ = a.signed_;
     for  (size_t i = 0; i != a.size; ++i)
         data.data[i] = a.data.data[i];
+    */
     return (*this);
 }
 void big_integer::set_size(big_integer & a, size_t siz)
@@ -302,6 +305,7 @@ bool big_integer::check_abecb(const big_integer & a, const big_integer & b, cons
     flag &= (sub == 0);
     return flag;
 }
+/*
 inline big_integer big_integer::div_bb(big_integer & reminder, big_integer const & b, bool type)
 {
     uint64_t digit = 0, d = 0; 
@@ -326,6 +330,60 @@ inline big_integer big_integer::div_bb(big_integer & reminder, big_integer const
         uint64_t r = a11_;
         r = std::min(digit / d, static_cast <uint64_t> (big_integer::a11_));
         l = std::min(digit / (d + 1), static_cast <uint64_t> (big_integer::a11_));
+        uint64_t m;
+        while (r - l > 1)
+        {
+            m = (r + l) / 2;
+            if (big_integer::check_abecb(reminder, b, m, i))
+                l = m;
+            else
+                r = m;
+        }
+        if (!(big_integer::check_abecb(reminder, b, r, i)))
+            r--;
+        res.data.data[i] = r;
+        sub_mul(reminder, b, r, i);
+        digit = static_cast <uint64_t> (reminder.data.data[i + pos]) << 32;
+    }
+    if (!type)
+        return res;
+    else
+        return reminder;
+}
+*/
+inline big_integer big_integer::div_bb(big_integer & reminder, big_integer b, bool type)
+{
+    uint64_t digit = 0, d = 0; 
+    size_t pos = 0;
+    for (size_t i = 0; i != b.size; ++i)
+        if (b.data.data[i] != 0)
+        {
+            pos = i;
+            d = b.data.data[i];
+        }
+    //mul_asign(reminder, (big_integer::a11_ / d));
+    //mul_asign(b, (big_integer::a11_ / d));
+    uint64_t norm = (static_cast <uint64_t> (big_integer::a11_) / (d + 1));
+    reminder *= norm;
+    b *= norm;
+    for (size_t i = 0; i != b.size; ++i)
+        if (b.data.data[i] != 0)
+        {
+            pos = i;
+            d = b.data.data[i];
+        }
+    big_integer res;
+    big_integer muller;
+    size_t max_size = reminder.size - pos;
+    big_integer::set_size(res, max_size);
+    big_integer::set_size(muller, max_size);
+    res.signed_ = reminder.signed_ ^ b.signed_;
+
+    for (size_t i = res.size - 1; i < res.size; --i)
+    {
+        digit |= reminder.data.data[i + pos];
+        uint64_t l = std::min(digit / (d + 1), static_cast <uint64_t> (big_integer::a11_));
+        uint64_t r = std::min(digit / d, static_cast <uint64_t> (big_integer::a11_));
         uint64_t m;
         while (r - l > 1)
         {
@@ -561,7 +619,7 @@ inline uint32_t big_integer::func_xor (uint32_t const & a_, uint32_t const & b_)
 {
     return a_ ^ b_;
 }
-void big_integer::swap (big_integer & a)
+void big_integer::swap (big_integer a)
 {
     std::swap(size, a.size);
     std::swap(signed_, a.signed_);
@@ -680,7 +738,8 @@ big_integer operator / (big_integer a, big_integer b)
 }
 big_integer operator % (big_integer a, big_integer b)
 {
-    return big_integer::div_bb(a, b, 1);
+    return a - (a / b) * b;
+    //return big_integer::div_bb(a, b, 1);
 }
 big_integer operator ^ (big_integer a, big_integer b)
 {

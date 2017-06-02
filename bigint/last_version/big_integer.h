@@ -34,7 +34,7 @@ public:
     ~big_integer();
     big_integer (big_integer const & a);
 
-    void swap (big_integer &);
+    void swap (big_integer );
     static void set_size(big_integer &, size_t);
     big_integer & operator = (big_integer const & a);
 
@@ -73,7 +73,8 @@ private:
     static inline std::string bi_to_string(big_integer s);
     static inline big_integer string_to_bi(std::string const & s);
     
-    static inline big_integer div_bb(big_integer & a, big_integer const & b, bool type);
+    static inline big_integer div_bb(big_integer & a, big_integer b, bool type);
+    //static inline big_integer div_bb(big_integer & a, big_integer const & b, bool type);
     static inline big_integer & shr_bb(big_integer & a, uint32_t b);
     static inline big_integer & shl_bb(big_integer & a, uint32_t b);
     
