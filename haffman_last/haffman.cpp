@@ -8,7 +8,7 @@
 extern status encode (status);
 extern status decode (status);
 extern tree_e build_tree (std::vector <size_t>);
-extern void build_tree (char *);
+extern void build_tree (char *, size_t);
 const size_t size_block = 10000;
 char input[(size_block + 2) * 256];
 char output[(size_block + 2) * 256];
@@ -34,7 +34,7 @@ int decode_file (int argc, char ** argv)
     a.ans = input;
     a.size = cread;
     a.pos = 0;
-    build_tree(input);
+    build_tree(input, cread);
     
     while (flag)
     {
@@ -62,8 +62,7 @@ int decode_file (int argc, char ** argv)
         a.rem_d = rem;
         a.pos_rem_d = pos_rem;
         a.out = output;
-        status b = decode(a);
-        a = b;
+        a = decode(a);
         out.write(a.ans, a.size);
     }
     return 0;
@@ -121,8 +120,7 @@ int encode_file (int argc, char ** argv)
         a.ans = input;
         a.size = cread;
         a.out = output;
-        status b = encode(a);
-        a = b;
+        a = encode(a);
         for (size_t i = 0; i != 4; ++i)
             out << static_cast < char>(a.size >> (i << 3));
         in.peek();

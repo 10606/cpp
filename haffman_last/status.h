@@ -45,7 +45,7 @@ public:
         pos_rem_e(0)
     {}
 
-    friend void build_tree(char * in);
+    friend void build_tree(char * in, size_t);
     friend tree_e build_tree(std::vector <size_t> freq_);
     friend status encode(status a);
     friend status decode (status a);

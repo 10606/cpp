@@ -9,7 +9,8 @@
 
 const size_t size_char = 8;
 const size_t max_char = 256;
-
+//char -> size_t static_cast<size_t> (static_cast <unsigden char> (c))
+// get status by &
 struct bin_tree
 {
     int32_t parent, left, right;
@@ -19,7 +20,13 @@ struct bin_tree
         right(_right)
     {}
 };
-
+//global variable -> status (wirk in thred)
+//tree_e -> vector<char> for write use .data
+//build_tree -> class with 2 constructor and methods
+//  get data
+//  encode
+//  decode
+//+in build_tree (char *) check size
 std::vector <bin_tree> tree; // -1 has not parent
 std::vector <size_t> length(max_char); 
 std::vector <size_t> freq;
@@ -73,8 +80,10 @@ void print_tree (size_t v,  /*std::shared_ptr <char>*/ char * to, size_t & pos_c
     set_bit(0, to, pos, ind_pos);
 }
 
-void build_tree(char * in)
+void build_tree(char * in, size_t size)
 {
+    if (size < 128 + 256)
+        throw;
     tree.clear();
     tree.push_back(bin_tree(-1, -1, -1));
     size_t pos = max_char;
