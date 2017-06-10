@@ -124,6 +124,7 @@ int encode_file (int argc, char ** argv)
             out.write(a.ans, a.size);
             if (a.get_pos_rem_e() != 0)
                 out << a.get_rem_e();
+            break;
         }
     }
     return 0;

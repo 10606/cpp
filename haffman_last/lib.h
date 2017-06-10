@@ -2,6 +2,7 @@
 #define LIB_H
 struct haffman 
 {
+private:
     struct bin_tree
     {
         int32_t parent, left, right;
@@ -18,11 +19,12 @@ struct haffman
     std::vector <size_t> freq;
     std::vector <size_t> correct_index;
     size_t v_start;
-    bool get_bit(char * const & from, size_t & pos, size_t & ind_bit);
-    void set_bit(bool const & bit, char * const & to, size_t & pos, size_t & ind_bit);
+    inline bool get_bit(char * const & from, size_t & pos, size_t & ind_bit);
+    inline void set_bit(bool const & bit, char * const & to, size_t & pos, size_t & ind_bit);
     void write(size_t const & c, int32_t const & child, char * const & to, size_t & pos, size_t & ind_bit);
     void get_lengths(size_t pos, size_t lenghts);
     void print_tree (size_t v, char * to, size_t & pos_char, size_t & pos, size_t & ind_pos);
+public:
     haffman (char * in, size_t size);
     haffman (std::vector <size_t> freq_);
     std::vector <char> get_tree();

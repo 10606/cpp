@@ -161,14 +161,12 @@ void haffman::encode(status & a)
     char * out = a.out;
     size_t size = a.size;
     char * in = a.ans;
-
     out[0] = a.rem_e;
     for (size_t i = 0; i != size; ++i)
     {
         size_t tmp = correct_index[(static_cast <size_t>(static_cast <unsigned char> (in[i])))];
         write(tree[tmp].parent, tmp, out, pos, ind_pos);
     }
-    
     a.ans = out;
     a.size = pos;
     a.pos = 0;
@@ -191,8 +189,7 @@ void haffman::decode (status & a)
     size_t lenn = (size << 3) + tail;
     for (size_t i = 0; i != lenn; ++i)
     {
-        bool to = get_bit(in, pos, ind_bit);
-        if (to)
+        if (get_bit(in, pos, ind_bit))
             v = tree[v].right;
         else
             v = tree[v].left;
