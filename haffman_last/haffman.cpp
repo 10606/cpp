@@ -5,13 +5,11 @@
 #include <iostream>
 #include <string.h>
 #include "status.h"
-extern status encode (status);
-extern status decode (status);
-extern tree_e build_tree (std::vector <size_t>);
-extern void build_tree (char *, size_t);
+#include "lib.h"
 const size_t size_block = 10000;
 char input[(size_block + 2) * 256];
 char output[(size_block + 2) * 256];
+
 int decode_file (int argc, char ** argv)
 {
     std::ifstream in(argv[2], std::ios::binary);
@@ -26,7 +24,6 @@ int decode_file (int argc, char ** argv)
         std::cout << " i cant open output file " << std::endl;
         return 1;
     }
-    bool flag = 1;
     char size [5]; 
     in.read(input, 128 + 256);
     size_t cread = in.gcount();
@@ -34,9 +31,9 @@ int decode_file (int argc, char ** argv)
     a.ans = input;
     a.size = cread;
     a.pos = 0;
-    build_tree(input, cread);
+    haffman decoder = haffman(input, cread);
     
-    while (flag)
+    while (1)
     {
         in.read(size, 5);
         cread = in.gcount();
@@ -44,8 +41,8 @@ int decode_file (int argc, char ** argv)
             break;
         cread = 0;
         for (size_t i = 0; i != 4; ++i)
-            cread |= (0xff & static_cast <size_t> (size[i])) << (i << 3);
-        size_t pos_rem = 0xff & static_cast <size_t> (size[4]);
+            cread |= (static_cast <size_t> (static_cast <unsigned char> (size[i]))) << (i << 3);
+        size_t pos_rem = static_cast <size_t> (static_cast <unsigned char> (size[4]));
         char rem = 0;
         if (pos_rem != 0)
         {
@@ -62,7 +59,7 @@ int decode_file (int argc, char ** argv)
         a.rem_d = rem;
         a.pos_rem_d = pos_rem;
         a.out = output;
-        a = decode(a);
+        decoder.decode(a);
         out.write(a.ans, a.size);
     }
     return 0;
@@ -76,7 +73,6 @@ int encode_file (int argc, char ** argv)
         std::cout << " i cant open output file " << std::endl;
         return 1;
     }
-    bool flag = 1;
     std::ifstream in_freq(argv[2], std::ios::binary);
     if (!in_freq.is_open())
     {
@@ -84,26 +80,19 @@ int encode_file (int argc, char ** argv)
         return 1;
     }
     std::vector <size_t> freq(256, 0);
-    while (flag)
+    while (1)
     {
         in_freq.read(input, size_block);
         size_t cread = in_freq.gcount();
         if (cread == 0)
             break;
-        for (size_t i = 0; i != cread; ++i)
-            freq[0xff & static_cast <size_t> (input[i])]++;
+        haffman::calc_freq(freq, input, cread);
     }
     status a;
-    try
-    {
-        tree_e tree(build_tree(freq));
-        out.write(tree.tree, tree.size);
-        //operator delete (a.ans);
-    }
-    catch(...)
-    {
-        return 1;
-    }
+    haffman encoder(freq);
+    std::vector <char> tree(encoder.get_tree());
+    out.write(tree.data(), tree.size());
+
     std::ifstream in(argv[2], std::ios::binary);
     if (!in.is_open())
     {
@@ -111,7 +100,7 @@ int encode_file (int argc, char ** argv)
         return 1;
     }
     a.pos = 0;
-    while (flag)
+    while (1)
     {
         in.read(input, size_block);
         size_t cread = in.gcount();
@@ -120,7 +109,7 @@ int encode_file (int argc, char ** argv)
         a.ans = input;
         a.size = cread;
         a.out = output;
-        a = encode(a);
+        encoder.encode(a);
         for (size_t i = 0; i != 4; ++i)
             out << static_cast < char>(a.size >> (i << 3));
         in.peek();
@@ -131,7 +120,7 @@ int encode_file (int argc, char ** argv)
         }
         else
         {
-            out << static_cast <char> (a.get_pos_rem_e() & 0xff);
+            out << static_cast <char> (a.get_pos_rem_e());
             out.write(a.ans, a.size);
             if (a.get_pos_rem_e() != 0)
                 out << a.get_rem_e();
@@ -152,9 +141,9 @@ int main (int argc, char ** argv)
         return 1;
     }
     if (strcmp(argv[1], encode0) == 0 || strcmp(argv[1], encode1) == 0)
-        /*return*/ encode_file(argc, argv);
+        return encode_file(argc, argv);
     else if (strcmp(argv[1], decode0) == 0 || strcmp(argv[1], decode1) == 0)
-        /*return*/ decode_file(argc, argv);
+        return decode_file(argc, argv);
     else 
     {
         printf("use: <encode/e/decode/d> <input_file_name> <output_file_name>");
