@@ -5,6 +5,7 @@
 #include <cstring>
 #include <memory>
 #include "big_integer.h"
+
 void big_integer::big_small::assign (const big_small & a, bool t1, bool t2)//1 - big
 {
     if (t1)
