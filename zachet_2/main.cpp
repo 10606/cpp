@@ -77,5 +77,8 @@ int main()
     {
         cout << *i << " rr " << endl;
     }
+    list <int> :: iterator kk = kek.begin();
+    list <int> :: iterator qq = kek.end();
+    std::cout << (kk == qq) << endl;
     
 }

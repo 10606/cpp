@@ -361,13 +361,25 @@ struct list : list_base <T>
 public:
     T val;
     list (T const & a):
+        list_base <T> :: list_base(a),
         val(a)
-    {
-    }
-    list ()
     {}
-    list (list_base <T> const & a)
+    list ():
+        list_base <T> :: list_base()
+    {}
+    list (list_base <T> const & a):
+        list_base <T> :: list_base(a)
     {}
     ~list ()
     {}
+    list & operator = (list <T> const & c)
+    {
+        list_base<T>::swap(c);
+        return (*this);
+    }
+    list & operator = (list_base <T> const & c)
+    {
+        list_base<T>::swap(c);
+        return (*this);
+    }
 };
