@@ -1,7 +1,15 @@
 #include <cstdio>
-#include "list.cpp"
+#include "list.h"
 using namespace std;
 
+ostream & operator << (ostream & s, list_base <int> const & tmp)
+{
+    for (list_base <int>::const_iterator i = tmp.begin(); i != tmp.end(); ++i)
+    {
+        cout << *i << endl;
+    }
+    return s;
+}
 int main()
 {
     cout << " ____ " << endl;
@@ -9,6 +17,7 @@ int main()
     kek.insert(kek.begin(), 7);
     kek.insert(kek.begin(), 8);
     kek.insert(kek.begin(), 9);
+    cout << kek;
     for (list_base <int>::iterator i = kek.begin(); i != kek.end(); ++i)
     {
         cout << (*i) << endl;
@@ -80,5 +89,11 @@ int main()
     list <int> :: iterator kk = kek.begin();
     list <int> :: iterator qq = kek.end();
     std::cout << (kk == qq) << endl;
-    
+    cout << lol.empty() << " " << kek.empty() << endl;
+    swap(lol, kek);
+    cout << lol.empty() << " " << tmp.empty() << endl;
+    swap(lol, tmp);
+    cout << tmp.empty() << " " << kek.empty() << endl;
+    swap(tmp, kek);
+    cout << tmp.empty() << " " << kek.empty() << endl;
 }

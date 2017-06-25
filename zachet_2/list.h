@@ -1,3 +1,4 @@
+#pragma once
 #include <cstdio>
 #include <iostream>
 #include <cstdlib>
@@ -62,19 +63,19 @@ public:
     typedef std::bidirectional_iterator_tag iterator_category;
     typedef std::reverse_iterator<iterator> reverse_iterator;
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
-    iterator rbegin()
+    reverse_iterator rbegin()
     {
         return iterator (this);
     }
-    iterator rend()
+    reverse_iterator rend()
     {
         return iterator (next);
     }
-    const_iterator rbegin() const
+    const_reverse_iterator rbegin() const
     {
         return const_iterator (const_cast <list_base *> (this));
     }
-    const_iterator rend() const
+    const_reverse_iterator rend() const
     {
         return const_iterator (const_cast <list_base *> (next));
     }
@@ -137,38 +138,48 @@ public:
         swap(c);
         return (*this);
     }
+    template <typename U> friend void swap(list_base <U> & a, list_base <U> & b);
 };
 
 template <typename T>
+void swap(list <T> & a, list <T> & b)
+{
+    swap(static_cast <list_base <T>  &> (a), static_cast <list_base <T>  &> (b));
+}
+template <typename T>
 void swap(list_base <T> & a, list_base <T> & b)
 {
+    if (a.empty() && b.empty())
+    {
+        b.next = &b;
+        b.prev = &b;
+        a.next = &a;
+        a.prev = &a;
+        return;
+    }
     if (a.empty())
     {
-        a->next = b->next;
-        a->prev = b->prev;
-        b->next = &b;
-        b->prev = &b;
+        a.next = b.next;
+        a.prev = b.prev;
+        b.next = &b;
+        b.prev = &b;
     }
     else if (b.empty())
     {
-        b->next = a->next;
-        b->prev = a->prev;
-        a->next = &a;
-        a->prev = &a;
+        b.next = a.next;
+        b.prev = a.prev;
+        a.next = &a;
+        a.prev = &a;
     }
     else
     {
         std::swap(a.next, b.next);
         std::swap(a.prev, b.prev);
     }
-    if (b.prev)
-        b.prev->next = &b;
-    if (b.next)
-        b.next->prev = &b;
-    if (a.prev)
-        a.prev->next = &a;
-    if (a.next)
-        a.next->prev = &a;
+    b.prev->next = &b;
+    b.next->prev = &b;
+    a.prev->next = &a;
+    a.next->prev = &a;
 }
 template <typename T> list_base <T>::
 list_base ():
@@ -353,8 +364,8 @@ public:
     {}
     const_iterator operator ++ ()
     {
-        val = val->next;
-        return val;
+        val = static_cast <list_base <T> *> (val->next);
+        return const_cast <list_base <T> *> (val);
     }
     const_iterator operator -- ()
     {
@@ -381,7 +392,7 @@ public:
     }
     T const & operator * ()
     {
-        return static_cast <list <T> *> (val)->val;
+        return static_cast <list <T> const *> (val)->val;
     }
 };
 template <typename T> 
@@ -411,4 +422,5 @@ public:
         list_base<T>::swap(c);
         return (*this);
     }
+    template <typename U> friend void swap(list_base <U> & a, list_base <U> & b);
 };
