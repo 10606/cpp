@@ -364,4 +364,10 @@ public:
         val(a)
     {
     }
+    list ()
+    {}
+    list (list_base <T> const & a)
+    {}
+    ~list ()
+    {}
 };
