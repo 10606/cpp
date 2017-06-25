@@ -112,12 +112,12 @@ public:
     iterator erase (const_iterator a, const_iterator b)
     {
         if (a == b)
-            return b;
+            return static_cast <iterator> (b);
         list_base * l = split_l(const_cast <list_base *> (a.get()));
         list_base * r = split_r(const_cast <list_base *> (b.get()));
         merge(l, r);
         delete a.get();
-        return b;
+        return static_cast <iterator> (b);
     }
     void splice (const_iterator pos, list_base & other, const_iterator a, const_iterator b)
     {
@@ -176,7 +176,7 @@ list_base (list_base const & a):
         prev(this),
         next(this)
 {
-    for (iterator i = a.begin(); i != a.end(); ++i)
+    for (iterator i = static_cast <iterator> (a.begin()); i != static_cast <iterator> (a.end()); ++i)
         insert(this, *i);
 }
 template <typename T> void list_base <T>::
@@ -264,7 +264,7 @@ public:
     iterator():
         val(0)
     {}
-    iterator(const_iterator a):
+    explicit iterator(const_iterator a):
         val(const_cast <list_base *> (a.get()))
     {}
     iterator(list_base * a):
