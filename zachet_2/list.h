@@ -5,45 +5,43 @@
 #include <memory>
 
 template <typename T>
-struct list;
+struct node;
 template <typename T>
-struct list_base
+struct list
 {
 protected:
-    list_base * prev, * next;
-    void set_link(list_base * pos, list_base * root);
-    list_base (list_base <T> const & a, list_base const * end_1);
-    list_base * split_l(list_base * a)
+    list * prev, * next;
+    list * split_l(list * a)
     {
-        list_base * ans = a->prev;
+        list * ans = a->prev;
         a->prev = 0;
         return ans;
     }
-    list_base * split_r(list_base * a)
+    list * split_r(list * a)
     {
         a->prev->next = 0;
         return a;
     }
-    list_base * split(list_base * a)
+    list * split(list * a)
     {
         a->prev->next = a->next;
         a->next->prev = a->prev;
-        list_base * ans = a->next;
+        list * ans = a->next;
         a->prev = 0;
         a->next = 0;
         return ans;
     }
-    void merge(list_base * a, list_base * b)
+    void merge(list * a, list * b)
     {
         a->next = b;
         b->prev = a;
     }
 public:
-    list_base ();
-    list_base (T const &);
-    ~list_base ();
-    list_base (list_base const & a);
-    void swap (list_base b);
+    list ();
+    list (T const &);
+    ~list ();
+    list (list const & a);
+    void swap (list b);
     bool empty ();
     void clear();
     void push_back(T const & a);
@@ -73,11 +71,11 @@ public:
     }
     const_reverse_iterator rbegin() const
     {
-        return const_iterator (const_cast <list_base *> (this));
+        return const_iterator (const_cast <list *> (this));
     }
     const_reverse_iterator rend() const
     {
-        return const_iterator (const_cast <list_base *> (next));
+        return const_iterator (const_cast <list *> (next));
     }
     iterator begin()
     {
@@ -89,24 +87,24 @@ public:
     }
     const_iterator begin() const
     {
-        return const_iterator (const_cast <list_base *> (next));
+        return const_iterator (const_cast <list *> (next));
     }
     const_iterator end() const
     {
-        return const_iterator (const_cast <list_base *> (this));
+        return const_iterator (const_cast <list *> (this));
     }
     iterator insert (const_iterator to, T const & a)
     {
-        list_base <T> * tmp = static_cast <list_base *> (new list <T> (a));
+        list <T> * tmp = static_cast <list *> (new node <T> (a));
         const_iterator to_ = to;
         to--;
-        merge(tmp, const_cast <list_base *> (to_.get()));
-        merge(const_cast <list_base *> (to.get()), tmp);
+        merge(tmp, const_cast <list *> (to_.get()));
+        merge(const_cast <list *> (to.get()), tmp);
         return static_cast <iterator> (tmp->next);
     }
     iterator erase (const_iterator to)
     {
-        list_base * tmp = split(const_cast <list_base *> (to.get()));
+        list * tmp = split(const_cast <list *> (to.get()));
         delete to.get();
         return static_cast <iterator> (tmp);
     }
@@ -114,40 +112,35 @@ public:
     {
         if (a == b)
             return static_cast <iterator> (b);
-        list_base * l = split_l(const_cast <list_base *> (a.get()));
-        list_base * r = split_r(const_cast <list_base *> (b.get()));
+        list * l = split_l(const_cast <list *> (a.get()));
+        list * r = split_r(const_cast <list *> (b.get()));
         merge(l, r);
         delete a.get();
         return static_cast <iterator> (b);
     }
-    void splice (const_iterator pos, list_base & other, const_iterator a, const_iterator b)
+    void splice (const_iterator pos, list & other, const_iterator a, const_iterator b)
     {
         if (a == b)
             return;
-        list_base * m = const_cast <list_base *> (b.get()->prev);
-        list_base * l = split_l(const_cast <list_base *> (a.get()));
-        list_base * r = split_r(const_cast <list_base *> (b.get()));
+        list * m = const_cast <list *> (b.get()->prev);
+        list * l = split_l(const_cast <list *> (a.get()));
+        list * r = split_r(const_cast <list *> (b.get()));
         const_iterator pos_ = pos;
         pos--;
         merge(l, r);
-        merge(const_cast <list_base *> (pos.get()), const_cast <list_base *> (a.get()));
-        merge(m, const_cast <list_base *> (pos_.get()));
+        merge(const_cast <list *> (pos.get()), const_cast <list *> (a.get()));
+        merge(m, const_cast <list *> (pos_.get()));
     }
-    list_base & operator = (list_base const & c)
+    list & operator = (list const & c)
     {
         swap(c);
         return (*this);
     }
-    template <typename U> friend void swap(list_base <U> & a, list_base <U> & b);
+    template <typename U> friend void swap(list <U> & a, list <U> & b);
 };
 
 template <typename T>
 void swap(list <T> & a, list <T> & b)
-{
-    swap(static_cast <list_base <T>  &> (a), static_cast <list_base <T>  &> (b));
-}
-template <typename T>
-void swap(list_base <T> & a, list_base <T> & b)
 {
     if (a.empty() && b.empty())
     {
@@ -181,20 +174,20 @@ void swap(list_base <T> & a, list_base <T> & b)
     a.prev->next = &a;
     a.next->prev = &a;
 }
-template <typename T> list_base <T>::
-list_base ():
+template <typename T> list <T>::
+list ():
     prev(this),
     next(this)
 {
 }
-template <typename T> list_base <T>::
-list_base (T const & a):
+template <typename T> list <T>::
+list (T const & a):
     prev(this),
     next(this)
 {
 }
-template <typename T> list_base <T>::
-~list_base ()
+template <typename T> list <T>::
+~list ()
 {
     if (empty())
         return;
@@ -207,16 +200,16 @@ template <typename T> list_base <T>::
         delete next;
     }
 }
-template <typename T> list_base <T>::
-list_base (list_base const & a):
+template <typename T> list <T>::
+list (list const & a):
         prev(this),
         next(this)
 {
     for (iterator i = static_cast <iterator> (a.begin()); i != static_cast <iterator> (a.end()); ++i)
         insert(this, *i);
 }
-template <typename T> void list_base <T>::
-swap (list_base b)
+template <typename T> void list <T>::
+swap (list b)
 {
     if (b.empty())
     {
@@ -234,12 +227,12 @@ swap (list_base b)
     if (next)
         next->prev = this;
 }
-template <typename T> bool list_base <T>::
+template <typename T> bool list <T>::
 empty ()
 {
     return (this == next && this == prev);
 }
-template <typename T> void list_base <T>::
+template <typename T> void list <T>::
 clear()
 {
     if (empty())
@@ -251,53 +244,53 @@ clear()
     next = this;
     prev = this;
 }
-template <typename T> void list_base <T>::
+template <typename T> void list <T>::
 push_front(T const & a)
 {
     insert(begin(), a);
 }
-template <typename T> void list_base <T>::
+template <typename T> void list <T>::
 pop_front()
 {
     erase(begin());
 }
-template <typename T> T const & list_base <T>::
+template <typename T> T const & list <T>::
 front() const
 {
-    return static_cast <list <T> *> (next)->val;
+    return static_cast <node <T> *> (next)->val;
 }
-template <typename T> T & list_base <T>::
+template <typename T> T & list <T>::
 front()
 {
-    return static_cast <list <T> *> (next)->val;
+    return static_cast <node <T> *> (next)->val;
 }
-template <typename T> void list_base <T>::
+template <typename T> void list <T>::
 push_back(T const & a)
 {
     insert(end(), a);
 }
-template <typename T> void list_base <T>::
+template <typename T> void list <T>::
 pop_back()
 {
     erase(end());
 }
-template <typename T> T const & list_base <T>::
+template <typename T> T const & list <T>::
 back() const
 {
-    return static_cast <list <T> *> (prev)->val;
+    return static_cast <node <T> *> (prev)->val;
 }
-template <typename T> T & list_base <T>::
+template <typename T> T & list <T>::
 back()
 {
-    return static_cast <list <T> *> (prev)->val;
+    return static_cast <node <T> *> (prev)->val;
 }
-template <typename T> struct list_base <T>::
+template <typename T> struct list <T>::
 iterator
 {
 private:
-    list_base * val;
+    list * val;
 public:
-    list_base * get()
+    list * get()
     {
         return val;
     }
@@ -305,9 +298,9 @@ public:
         val(0)
     {}
     explicit iterator(const_iterator a):
-        val(const_cast <list_base *> (a.get()))
+        val(const_cast <list *> (a.get()))
     {}
-    iterator(list_base * a):
+    iterator(list * a):
         val(a)
     {}
     iterator & operator ++ ()
@@ -332,7 +325,7 @@ public:
     }
     T & operator * ()
     {
-        return static_cast <list <T> *> (val)->val;
+        return static_cast <node <T> *> (val)->val;
     }
     bool operator != (iterator a)
     {
@@ -343,17 +336,17 @@ public:
         return a.val == val;
     }
 };
-template <typename T> struct list_base <T>::
+template <typename T> struct list <T>::
 const_iterator
 {
 private:
-    list_base const * val;
+    list const * val;
 public:
-    list_base * get()
+    list * get()
     {
-        return const_cast <list_base *> (val);
+        return const_cast <list *> (val);
     }
-    const_iterator(list_base * a):
+    const_iterator(list * a):
         val(a)
     {}
     const_iterator():
@@ -364,8 +357,8 @@ public:
     {}
     const_iterator operator ++ ()
     {
-        val = static_cast <list_base <T> *> (val->next);
-        return const_cast <list_base <T> *> (val);
+        val = static_cast <list <T> *> (val->next);
+        return const_cast <list <T> *> (val);
     }
     const_iterator operator -- ()
     {
@@ -392,35 +385,38 @@ public:
     }
     T const & operator * ()
     {
-        return static_cast <list <T> const *> (val)->val;
+        return static_cast <node <T> const *> (val)->val;
     }
 };
 template <typename T> 
-struct list : list_base <T>
+struct node : list <T>
 {
 public:
     T val;
-    list (T const & a):
-        list_base <T> :: list_base(a),
+    node (T const & a):
+        list <T> :: list(a),
         val(a)
     {}
-    list ():
-        list_base <T> :: list_base()
+    /*
+    node ():
+        list <T> :: list()
     {}
-    list (list_base <T> const & a):
-        list_base <T> :: list_base(a)
+    node (list <T> const & a):
+        list <T> :: list(a)
     {}
-    ~list ()
+    
+    ~node ()
     {}
-    list & operator = (list <T> const & c)
+    node & operator = (node <T> const & c)
     {
-        list_base<T>::swap(c);
+        list<T>::swap(c);
         return (*this);
     }
-    list & operator = (list_base <T> const & c)
+    node & operator = (list <T> const & c)
     {
-        list_base<T>::swap(c);
+        list<T>::swap(c);
         return (*this);
     }
-    template <typename U> friend void swap(list_base <U> & a, list_base <U> & b);
+    template <typename U> friend void swap(list <U> & a, list <U> & b);
+    */
 };
