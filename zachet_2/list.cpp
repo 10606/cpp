@@ -142,8 +142,33 @@ public:
 template <typename T>
 void swap(list_base <T> & a, list_base <T> & b)
 {
-    std::swap(a.next, b.next);
-    std::swap(a.prev, b.prev);
+    if (a.empty())
+    {
+        a->next = b->next;
+        a->prev = b->prev;
+        b->next = &b;
+        b->prev = &b;
+    }
+    else if (b.empty())
+    {
+        b->next = a->next;
+        b->prev = a->prev;
+        a->next = &a;
+        a->prev = &a;
+    }
+    else
+    {
+        std::swap(a.next, b.next);
+        std::swap(a.prev, b.prev);
+    }
+    if (b.prev)
+        b.prev->next = &b;
+    if (b.next)
+        b.next->prev = &b;
+    if (a.prev)
+        a.prev->next = &a;
+    if (a.next)
+        a.next->prev = &a;
 }
 template <typename T> list_base <T>::
 list_base ():
@@ -189,6 +214,10 @@ swap (list_base b)
     }
     std::swap(next, b.next);
     std::swap(prev, b.prev);
+    if (b.prev)
+        b.prev->next = &b;
+    if (b.next)
+        b.next->prev = &b;
     if (prev)
         prev->next = this;
     if (next)
