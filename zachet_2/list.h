@@ -397,26 +397,4 @@ public:
         list <T> :: list(a),
         val(a)
     {}
-    /*
-    node ():
-        list <T> :: list()
-    {}
-    node (list <T> const & a):
-        list <T> :: list(a)
-    {}
-    
-    ~node ()
-    {}
-    node & operator = (node <T> const & c)
-    {
-        list<T>::swap(c);
-        return (*this);
-    }
-    node & operator = (list <T> const & c)
-    {
-        list<T>::swap(c);
-        return (*this);
-    }
-    template <typename U> friend void swap(list <U> & a, list <U> & b);
-    */
 };
