@@ -71,7 +71,7 @@ public:
     template <typename R>
     friend void swap(deque <R> & a, deque <R> & b);
 };
-
+/*
 template <typename T>
 std::ostream & operator << (std::ostream & s, deque <T> a)
 {
@@ -79,6 +79,7 @@ std::ostream & operator << (std::ostream & s, deque <T> a)
         s << *i << ", ";
     return s;
 }
+*/
 #include "iterators.h"
 
 template <typename T>
@@ -191,7 +192,7 @@ template <typename T>
 void deque<T>::clear()
 {
     if (!empty())
-        delete data;
+        delete [] data;
     siz = 0;
     start = 0;
     capacity = 0;

@@ -2,6 +2,13 @@
 #include "deque.h"
 using namespace std;
 
+template <typename T>
+std::ostream & operator << (std::ostream & s, deque <T> a)
+{
+    for (typename deque<T>::const_iterator i = a.begin(); i != a.end(); ++i)
+        s << *i << ", ";
+    return s;
+}
 
 int main()
 {

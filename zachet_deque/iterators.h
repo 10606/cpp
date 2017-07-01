@@ -1,4 +1,4 @@
-
+#pragma once
 template <typename T> //TODO
 struct deque<T>::iterator
 {
