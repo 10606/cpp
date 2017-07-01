@@ -54,28 +54,23 @@ public:
     T & front();
     struct iterator;
     struct const_iterator;
-    typedef T value_type;
-    typedef std::ptrdiff_t difference_type;
-    typedef T* pointer;
-    typedef T& reference;
-    typedef std::bidirectional_iterator_tag iterator_category;
     typedef std::reverse_iterator<iterator> reverse_iterator;
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
     reverse_iterator rbegin()
     {
-        return iterator (this);
+        return reverse_iterator (this);
     }
     reverse_iterator rend()
     {
-        return iterator (next);
+        return reverse_iterator (next);
     }
     const_reverse_iterator rbegin() const
     {
-        return const_iterator (const_cast <list *> (this));
+        return const_reverse_iterator (const_cast <list *> (this));
     }
     const_reverse_iterator rend() const
     {
-        return const_iterator (const_cast <list *> (next));
+        return const_reverse_iterator (const_cast <list *> (next));
     }
     iterator begin()
     {
@@ -205,7 +200,7 @@ list (list const & a):
         prev(this),
         next(this)
 {
-    for (iterator i = static_cast <iterator> (a.begin()); i != static_cast <iterator> (a.end()); ++i)
+    for (iterator i = a.begin(); i != a.end(); ++i)
         insert(this, *i);
 }
 template <typename T> void list <T>::
@@ -272,7 +267,7 @@ push_back(T const & a)
 template <typename T> void list <T>::
 pop_back()
 {
-    erase(end());
+    erase(--end());
 }
 template <typename T> T const & list <T>::
 back() const
@@ -289,16 +284,21 @@ iterator
 {
 private:
     list * val;
+    explicit iterator(const_iterator a):
+        val(const_cast <list *> (a.get()))
+    {}
 public:
+    typedef T value_type;
+    typedef std::ptrdiff_t difference_type;
+    typedef T* pointer;
+    typedef T& reference;
+    typedef std::bidirectional_iterator_tag iterator_category;
     list * get()
     {
         return val;
     }
     iterator():
         val(0)
-    {}
-    explicit iterator(const_iterator a):
-        val(const_cast <list *> (a.get()))
     {}
     iterator(list * a):
         val(a)
@@ -327,14 +327,15 @@ public:
     {
         return static_cast <node <T> *> (val)->val;
     }
-    bool operator != (iterator a)
+    bool operator != (iterator const & a)
     {
         return a.val != val;
     }
-    bool operator == (iterator a)
+    bool operator == (iterator const & a)
     {
         return a.val == val;
     }
+    friend struct list;
 };
 template <typename T> struct list <T>::
 const_iterator
@@ -342,6 +343,11 @@ const_iterator
 private:
     list const * val;
 public:
+    typedef T value_type;
+    typedef std::ptrdiff_t difference_type;
+    typedef T* pointer;
+    typedef T& reference;
+    typedef std::bidirectional_iterator_tag iterator_category;
     list * get()
     {
         return const_cast <list *> (val);
@@ -375,11 +381,11 @@ public:
         val = val->prev;
         return val->next;
     }
-    bool operator != (const_iterator a)
+    bool operator != (const_iterator const & a)
     {
         return a.val != val;
     }
-    bool operator == (const_iterator a)
+    bool operator == (const_iterator const & a)
     {
         return a.val == val;
     }
