@@ -12,6 +12,14 @@ public:
     typedef T* pointer;
     typedef T& reference;
     typedef std::bidirectional_iterator_tag iterator_category;
+    
+    template <typename G>
+    iterator (typename deque <G>::const_iterator a, typename std::enable_if <std::is_same <T, const G>::value>::type* = nullptr)
+    {
+        data = a.data;
+        pos = a.pos;
+        capacity = a.capacity;
+    }
                          
     iterator & operator = (iterator const & a)
     {
@@ -34,39 +42,48 @@ public:
     {}
     iterator ()
     {}
-    std::ptrdiff_t operator - (deque<T>::iterator a)
+    /*
+    template <typename D>
+    std::ptrdiff_t operator - (typename deque<D>::iterator const & a) const
     {
         return pos - a.pos;
     }
-    bool operator < (deque<T>::iterator a)
+    template <typename D>
+    bool operator < (typename deque<D>::iterator const & a) const
     {
         return ((*this) - a) < 0;
     }
-    bool operator <= (deque<T>::iterator a)
+    template <typename D>
+    bool operator <= (typename deque<D>::iterator const & a) const
     {
         return ((*this) - a) <= 0;
     }
-    bool operator > (deque<T>::iterator a)
+    template <typename D>
+    bool operator > (typename deque<D>::iterator const & a) const
     {
         return ((*this) - a) > 0;
     }
-    bool operator >= (deque<T>::iterator a)
+    template <typename D>
+    bool operator >= (typename deque<D>::iterator const & a) const
     {
         return ((*this) - a) >= 0;
     }
-    bool operator != (deque<T>::iterator a)
+    template <typename D>
+    bool operator != (typename deque<D>::iterator const & a) const
     {
         return (data != a.data) || (pos != a.pos);
     }
-    bool operator == (deque<T>::iterator a)
+    template <typename D>
+    bool operator == (typename deque<D>::iterator const & a) const
     {
         return (data == a.data) && (pos == a.pos);
     }
-    T & operator *()
+    */
+    T & operator *() const
     {
         return *(data + (pos  % capacity));
     }
-    T & operator [] (std::ptrdiff_t a)
+    T & operator [] (std::ptrdiff_t a) const
     {
         return *(*this + a);
     }
@@ -112,10 +129,42 @@ public:
         *this = *this + 1;
         return tmp;;
     }
+    
+    
     template <typename D>
     friend typename deque<D>::iterator operator + (std::ptrdiff_t a, typename deque<D>::iterator b);
     friend struct const_iterator;
+    
+    friend std::ptrdiff_t operator - (typename deque<T>::iterator a, typename deque<T>::iterator b)
+    {
+        return a.pos - b.pos;
+    }
+    friend bool operator < (typename deque<T>::iterator a, typename deque<T>::iterator b)
+    {
+        return (a - b) < 0;
+    }
+    friend bool operator <= (typename deque<T>::iterator a, typename deque<T>::iterator b)
+    {
+        return (a - b) <= 0;
+    }
+    friend bool operator > (typename deque<T>::iterator a, typename deque<T>::iterator b)
+    {
+        return (a - b) > 0;
+    }
+    friend bool operator >= (typename deque<T>::iterator a, typename deque<T>::iterator b)
+    {
+        return (a - b) >= 0;
+    }
+    friend bool operator != (typename deque<T>::iterator a, typename deque<T>::iterator b)
+    {
+        return (b.data != a.data) || (b.pos != a.pos);
+    }
+    friend bool operator == (typename deque<T>::iterator a, typename deque<T>::iterator b)
+    {
+        return (b.data == a.data) && (b.pos == a.pos);
+    }
 };
+
 
 template <typename T>
 typename deque<T>::iterator operator + (std::ptrdiff_t a, typename deque<T>::iterator b)
@@ -132,17 +181,28 @@ private:
     size_t pos;
     size_t capacity;
 public:
-    typedef T value_type;
+    typedef T const value_type;
     typedef std::ptrdiff_t difference_type;
-    typedef T* pointer;
-    typedef T& reference;
+    typedef T const * pointer;
+    typedef T const & reference;
     typedef std::bidirectional_iterator_tag iterator_category;
+    
+    /*
+    template <typename G>
+    const_iterator (typename deque <G>::iterator a, typename std::enable_if <std::is_same <const T, G>::value>::type* = nullptr)
                          
+    {
+        data = a.data;
+        pos = a.pos;
+        capacity = a.capacity;
+    }
+    */
     const_iterator (iterator const & a):
         data(a.data),
         pos(a.pos),
         capacity(a.capacity)
     {}
+    
     const_iterator & operator = (const_iterator const & a)
     {
         data = a.data;
@@ -162,39 +222,11 @@ public:
     {}
     const_iterator ()
     {}
-    std::ptrdiff_t operator - (deque<T>::const_iterator a)
+    T const & operator * () const 
     {
-        return pos - a.pos;
+        return data[pos % capacity];
     }
-    bool operator < (deque<T>::const_iterator a)
-    {
-        return ((*this) - a) < 0;
-    }
-    bool operator <= (deque<T>::const_iterator a)
-    {
-        return ((*this) - a) <= 0;
-    }
-    bool operator > (deque<T>::const_iterator a)
-    {
-        return ((*this) - a) > 0;
-    }
-    bool operator >= (deque<T>::const_iterator a)
-    {
-        return ((*this) - a) >= 0;
-    }
-    bool operator != (deque<T>::const_iterator a)
-    {
-        return (data != a.data) || (pos != a.pos);
-    }
-    bool operator == (deque<T>::const_iterator a)
-    {
-        return (data == a.data) && (pos == a.pos);
-    }
-    T const & operator *()
-    {
-        return *(data + (pos  % capacity));
-    }
-    T const & operator [] (std::ptrdiff_t a)
+    T const & operator [] (std::ptrdiff_t a) const
     {
         return *(*this + a);
     }
@@ -240,9 +272,74 @@ public:
         *this = *this + 1;
         return tmp;;
     }
+    /*
     template <typename D>
-    friend typename deque<D>::const_iterator operator + (std::ptrdiff_t a, typename deque<D>::const_iterator b);
+    std::ptrdiff_t operator - (typename deque<D>::const_iterator const & a) const
+    {
+        return pos - a.pos;
+    }
+    template <typename D>
+    bool operator < (typename deque<D>::const_iterator const & a) const
+    {
+        return ((*this) - a) < 0;
+    }
+    template <typename D>
+    bool operator <= (typename deque<D>::const_iterator const & a) const
+    {
+        return ((*this) - a) <= 0;
+    }
+    template <typename D>
+    bool operator > (typename deque<D>::const_iterator const & a) const
+    {
+        return ((*this) - a) > 0;
+    }
+    template <typename D>
+    bool operator >= (typename deque<D>::const_iterator const & a) const
+    {
+        return ((*this) - a) >= 0;
+    }
+    template <typename D>
+    bool operator != (typename deque<D>::const_iterator const & a) const
+    {
+        return (data != a.data) || (pos != a.pos);
+    }
+    template <typename D>
+    bool operator == (typename deque<D>::const_iterator const & a) const
+    {
+        return (data == a.data) && (pos == a.pos);
+    }
+    */
+    
+    friend std::ptrdiff_t operator - (typename deque<T>::const_iterator a, typename deque<T>::const_iterator b)
+    {
+        return a.pos - b.pos;
+    }
+    friend bool operator < (typename deque<T>::const_iterator a, typename deque<T>::const_iterator b)
+    {
+        return (a - b) < 0;
+    }
+    friend bool operator <= (typename deque<T>::const_iterator a, typename deque<T>::const_iterator b)
+    {
+        return (a - b) <= 0;
+    }
+    friend bool operator > (typename deque<T>::const_iterator a, typename deque<T>::const_iterator b)
+    {
+        return (a - b) > 0;
+    }
+    friend bool operator >= (typename deque<T>::const_iterator a, typename deque<T>::const_iterator b)
+    {
+        return (a - b) >= 0;
+    }
+    friend bool operator != (typename deque<T>::const_iterator a, typename deque<T>::const_iterator b)
+    {
+        return (b.data != a.data) || (b.pos != a.pos);
+    }
+    friend bool operator == (typename deque<T>::const_iterator a, typename deque<T>::const_iterator b)
+    {
+        return (b.data == a.data) && (b.pos == a.pos);
+    }
 };
+
 
 template <typename T>
 typename deque<T>::const_iterator operator + (std::ptrdiff_t a, typename deque<T>::const_iterator b)

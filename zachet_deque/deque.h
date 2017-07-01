@@ -118,17 +118,17 @@ void deque<T>::realloc()
 {
     if (capacity == 0)
     {
-        data = new T[1];
+        data = static_cast <T*> (operator new (sizeof(T)));
         capacity = 1;
         return;
     }
-    T * t_data = new T[capacity * 2];
+    T * t_data = static_cast <T*> (operator new (capacity * 2 * sizeof(T)));
     for (size_t i = 0; i != siz; ++i)
     {
         std::swap(t_data[i], data[(start + i) % capacity]);
     }
     std::swap(data, t_data);
-    delete [] t_data;
+    operator delete (t_data);
     capacity *= 2;
     start = 0;
 };
@@ -146,7 +146,7 @@ template <typename T>
 deque<T>::~deque()
 {
     if (!empty())
-        delete [] data;
+        operator delete (data);
 }
 
 template <typename T>
@@ -192,7 +192,7 @@ template <typename T>
 void deque<T>::clear()
 {
     if (!empty())
-        delete [] data;
+        operator delete (data);
     siz = 0;
     start = 0;
     capacity = 0;
@@ -222,12 +222,14 @@ void deque<T>::push_front(T const & a)
 template <typename T>
 void deque<T>::pop_back()
 {
+    data[(siz + start) % capacity].~T();
     siz--;
 }
 
 template <typename T>
 void deque<T>::pop_front()
 {
+    data[(start) % capacity].~T();
     start = (start + 1) % capacity;
     siz--;
 }
@@ -366,3 +368,6 @@ void swap(deque <R> & a, deque <R> & b)
     std::swap(b.capacity, a.capacity);
     std::swap(b.start, a.start);
 }
+
+//comare iterator const_iterator
+//*reverse_iterator 
