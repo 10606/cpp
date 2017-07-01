@@ -264,6 +264,7 @@ typename deque<T>::iterator deque<T>::insert (const_iterator pos, T const & a) /
         ind = pos - begin();
         push_back(a);
         swap_d((ind + start) % capacity, (start + siz + capacity - 1) % capacity);
+        return deque<T>::iterator(data, (ind + start) % capacity, capacity);
     }
     else   
     {
@@ -271,8 +272,8 @@ typename deque<T>::iterator deque<T>::insert (const_iterator pos, T const & a) /
         push_front(a);
         ind = (ind + 1) % capacity;
         swap_f(start, (ind + start) % capacity);
+        return deque<T>::iterator(data, (ind + start - 1 + capacity) % capacity, capacity);
     }
-    return deque<T>::iterator(data, ind, capacity);
 }
 
 template <typename T>
@@ -288,10 +289,10 @@ typename deque<T>::iterator deque<T>::erase (const_iterator pos) //TODO
     else   
     {
         ind = pos - begin();
-        swap_d(start, ind);
+        swap_d(start, (start + ind) % capacity);
         pop_front();
     }
-    return deque<T>::iterator(data, ind, capacity);
+    return deque<T>::iterator(data, (ind + start) % capacity, capacity);
 }
 
 template <typename T>
