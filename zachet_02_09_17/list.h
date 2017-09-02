@@ -352,7 +352,9 @@ private:
         val(const_cast <list *> (a.get())),
         valid(a.valid)
     {
-        val->list_iter.push_back(this);
+        std::cout << "MAKE FROM CONST_ITERATOR" << std::endl;
+        if (valid)
+            val->list_iter.push_back(this);
     }
     void clear_i()
     {
@@ -376,7 +378,8 @@ public:
         type(0),
         val(0),
         valid(0)
-    {}
+    {   
+    }
     iterator(list * a, list * b):
         type(b),
         val(a),
@@ -384,6 +387,28 @@ public:
     {
         val->list_iter.push_back(this);
     }
+    
+    iterator (iterator const & a):
+        type(a.type),
+        val(a.val),
+        valid(a.valid)
+    {
+        if (valid)
+            val->list_iter.push_back(this);
+    }
+    
+    iterator & operator = (iterator const & a)
+    {
+        if (valid)
+            clear_i();
+        type = a.type,
+        val = a.val,
+        valid = a.valid;
+        if (valid)
+            val->list_iter.push_back(this);
+        return *this;
+    }
+    
     iterator & operator ++ ()
     {
         assert(valid);
@@ -489,6 +514,25 @@ public:
     {
         if (valid)
             val->list_c_iter.push_back(this);
+    }
+    const_iterator (const_iterator const & a):
+        type(a.type),
+        val(a.val),
+        valid(a.valid)
+    {
+        if (valid)
+            val->list_c_iter.push_back(this);
+    }
+    const_iterator & operator = (const_iterator const & a)
+    {
+        if (valid)
+            clear_i();
+        type = a.type,
+        val = a.val,
+        valid = a.valid;
+        if (valid)
+            val->list_c_iter.push_back(this);
+        return *this;
     }
     const_iterator operator ++ ()
     {
