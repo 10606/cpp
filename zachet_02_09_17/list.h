@@ -1,8 +1,8 @@
+#pragma once
 #include <iostream>
 #include <assert.h>
 #include <vector>
 #include <algorithm>
-#pragma once
 #include <cstdio>
 #include <iostream>
 #include <cstdlib>
@@ -49,7 +49,7 @@ public:
     virtual ~list ();
     list (list const & a);
     void swap (list b);
-    bool empty ();
+    bool empty () const;
     void clear();
     void push_back(T const & a);
     void push_front(T const & a);
@@ -73,11 +73,11 @@ public:
     }
     const_reverse_iterator rbegin() const
     {
-        return const_reverse_iterator (const_iterator (const_cast <list *> (this), this));
+        return const_reverse_iterator (const_iterator (const_cast <list *> (this), const_cast <list *> (this))); //
     }
     const_reverse_iterator rend() const
     {
-        return const_reverse_iterator (const_iterator (const_cast <list *> (next), this));
+        return const_reverse_iterator (const_iterator (const_cast <list *> (next), const_cast <list *> (this))); //
     }
     iterator begin()
     {
@@ -89,11 +89,11 @@ public:
     }
     const_iterator begin() const
     {
-        return const_iterator (const_cast <list *> (next), this);
+        return const_iterator (const_cast <list *> (next), const_cast <list *> (this)); //
     }
     const_iterator end() const
     {
-        return const_iterator (const_cast <list *> (this), this);
+        return const_iterator (const_cast <list *> (this), const_cast <list *> (this)); //
     }
     iterator insert (const_iterator to, T const & a)
     {
@@ -280,7 +280,7 @@ swap (list b) //invalidate
         next->prev = this;
 }
 template <typename T> bool list <T>::
-empty ()
+empty () const
 {
     return (this == next && this == prev);
 }
@@ -440,7 +440,8 @@ public:
     }
     ~iterator ()
     {
-        clear_i();
+        if (valid)
+            clear_i();
     }
     friend struct list;
 };
@@ -546,7 +547,8 @@ public:
     friend struct list;
     ~const_iterator ()
     {
-        clear_i();
+        if (valid)
+            clear_i();
     }
 };
 template <typename T> 
