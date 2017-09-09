@@ -9,6 +9,22 @@
 #include <memory>
 
 template <typename T>
+struct list;
+
+template <typename T>
+struct global
+{
+    int cnt;
+    bool valid;
+    list <T> * type;
+    global(list <T> * type_):
+        cnt(1),
+        valid(1),
+        type(type_)
+    {}
+};
+
+template <typename T>
 struct node;
 template <typename T>
 struct list
@@ -16,7 +32,8 @@ struct list
     template <typename U>
     friend struct node;
 protected:
-    list * prev, * next;
+    global <T> * gpointer;
+    list * prev, * next, * root;
     bool is_end;
     list * split_l(list * a)
     {
@@ -65,41 +82,42 @@ public:
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
     reverse_iterator rbegin()
     {
-        return reverse_iterator (iterator (this, this));
+        return reverse_iterator (iterator (this));
     }
     reverse_iterator rend()
     {
-        return reverse_iterator (iterator (next, this));
+        return reverse_iterator (iterator (next));
     }
     const_reverse_iterator rbegin() const
     {
-        return const_reverse_iterator (const_iterator (const_cast <list *> (this), const_cast <list *> (this))); //
+        return const_reverse_iterator (const_iterator (const_cast <list *> (this))); //
     }
     const_reverse_iterator rend() const
     {
-        return const_reverse_iterator (const_iterator (const_cast <list *> (next), const_cast <list *> (this))); //
+        return const_reverse_iterator (const_iterator (const_cast <list *> (next))); //
     }
     iterator begin()
     {
-        return iterator (next, this);
+        return iterator (next);
     }
     iterator end()
     {
-        return iterator (this, this);
+        return iterator (this);
     }
     const_iterator begin() const
     {
-        return const_iterator (const_cast <list *> (next), const_cast <list *> (this)); //
+        return const_iterator (const_cast <list *> (next)); //
     }
     const_iterator end() const
     {
-        return const_iterator (const_cast <list *> (this), const_cast <list *> (this)); //
+        return const_iterator (const_cast <list *> (this)); //
     }
     iterator insert (const_iterator to, T const & a)
     {
         assert (to.valid);
-        assert (to.type == this);
-        list <T> * tmp = static_cast <list *> (new node <T> (a));
+        assert (to.check());
+        assert (to.gpointer->type == this);
+        list <T> * tmp = static_cast <list *> (new node <T> (a, this));
         const_iterator to_ = to;
         if (to != begin())
             to--;
@@ -107,24 +125,27 @@ public:
             to = end();
         merge(tmp, const_cast <list *> (to_.get()));
         merge(const_cast <list *> (to.get()), tmp);
-        return iterator(tmp->next, this);
+        return iterator(tmp->next);
     }
     iterator erase (const_iterator to) //invalidate
     {
         assert (to.valid);
-        assert (to.type == this);
+        assert (to.check());
+        assert (to.gpointer->type == this);
         assert (!(to.get()->is_end));
         list * tmp = split(const_cast <list *> (to.get()));
         delete to.get();
-        return iterator(tmp, this);
+        return iterator(tmp);
     }
     
     iterator erase (const_iterator a, const_iterator b)
     {
         assert(a.valid);
         assert(b.valid);
-        assert (a.type == this);
-        assert (b.type == this);
+        assert(a.check());
+        assert(b.check());
+        assert (a.gpointer->type == this);
+        assert (b.gpointer->type == this);
         assert (!(a.get()->is_end));
         for (const_iterator i = a; i != b; ++i)
         {}
@@ -141,29 +162,36 @@ public:
     {
         assert(a.valid);
         assert(b.valid);
+        assert(a.check());
+        assert(b.check());
         assert (pos.valid);
-        assert (a.type == this);
-        assert (b.type == this);
-        assert (pos.type == &other);
+        assert (pos.check());
+        assert (a.gpointer->type == &other);
+        assert (b.gpointer->type == &other);
+        assert (pos.gpointer->type == this);
         if (a == b)
             return;
         for (const_iterator i = a; i != b; ++i)
         {
+            //TODO in global field type
             assert (i != pos);
+            i.gpointer->type = this;
+            /*
             for (typename std::vector <iterator *> :: iterator j = i.get()->list_iter.begin(); j != i.get()->list_iter.end(); ++j)
                 (*j)->type = this;
             for (typename std::vector <const_iterator *> :: iterator j = i.get()->list_c_iter.begin(); j != i.get()->list_c_iter.end(); ++j)
                 (*j)->type = this;
+            */
         }
         
         list * m = const_cast <list *> (b.get()->prev);
         list * l = split_l(const_cast <list *> (a.get()));
         list * r = split_r(const_cast <list *> (b.get()));
         const_iterator pos_ = pos;
-        if (pos != other.begin())
+        if (pos != begin())
             pos--;
         else 
-            pos = other.end();
+            pos = end();
         merge(l, r);
         merge(const_cast <list *> (pos.get()), const_cast <list *> (a.get()));
         merge(m, const_cast <list *> (pos_.get()));
@@ -175,8 +203,8 @@ public:
     }
     template <typename U> friend void swap(list <U> & a, list <U> & b);
 public:
-    std::vector <list <T>::      iterator*> list_iter; 
-    std::vector <list <T>::const_iterator*> list_c_iter; 
+    //std::vector <list <T>::      iterator*> list_iter; 
+    //std::vector <list <T>::const_iterator*> list_c_iter; 
 };
 
 template <typename T>
@@ -218,8 +246,10 @@ template <typename T> list <T>::
 list ():
     prev(this),
     next(this),
+    root(this),
     is_end(1)
 {
+    gpointer = new global <T> (root); //TODO not this  
 }
 /*
 template <typename T> list <T>::
@@ -232,8 +262,11 @@ list (T const & a):
 template <typename T> list <T>::
 ~list () //invalidate all
 {
-    if (empty())
-        return;
+    gpointer->cnt--;
+    gpointer->valid = 0;
+    if (gpointer->cnt == 0)
+        delete gpointer;
+    /*
     for (typename std::vector <list <T> :: iterator *> :: iterator i = list_iter.begin(); i != list_iter.end(); ++i)
     {
         (*i)->valid = 0;
@@ -242,6 +275,9 @@ template <typename T> list <T>::
     {
         (*i)->valid = 0;
     }
+    */
+    if (empty())
+        return;
     if (next)
         next->prev = 0;
     if (prev)
@@ -255,8 +291,10 @@ template <typename T> list <T>::
 list (list const & a):
         prev(this),
         next(this),
+        root(this),
         is_end(1)
 {
+    gpointer = new global <T> (this); //TODO not this
     for (const_iterator i = a.begin(); i != a.end(); ++i)
         push_back(*i);
 }
@@ -344,25 +382,52 @@ template <typename T> struct list <T>::
 iterator
 {
 private:
-    list * type;
+    global <T> * gpointer;
     list * val;
     bool valid;
     explicit iterator(const_iterator a):
-        type(a.type),
+        gpointer(a.gpointer),
         val(const_cast <list *> (a.get())),
         valid(a.valid)
     {
-        std::cout << "MAKE FROM CONST_ITERATOR" << std::endl;
+        //std::cout << "MAKE FROM CONST_ITERATOR" << std::endl;
         if (valid)
-            val->list_iter.push_back(this);
+        {
+            //val->list_iter.push_back(this);
+            gpointer->cnt++;
+        }
+    }
+    bool check() const
+    {
+        if (!valid || gpointer == 0)
+            return 0;
+        return gpointer->valid;
+    }
+    void push_i()
+    {
+        if (!valid || gpointer == 0)
+        {
+            gpointer->cnt--;
+            if (gpointer->cnt == 0)
+                delete gpointer;
+        }
+        gpointer = val->gpointer;
+        gpointer->cnt++;
     }
     void clear_i()
     {
+        /*
         std::vector <iterator *> tmp;
         for (typename std::vector <iterator *> :: iterator i = val->list_iter.begin(); i != val->list_iter.end(); ++i)
             if ((*i) != this)
                 tmp.push_back(*i);
         val->list_iter = tmp;
+        */
+        if (!valid || gpointer == 0)
+            return;
+        gpointer->cnt--;
+        if (gpointer->cnt == 0)
+            delete gpointer;
     }
 public:
     typedef T value_type;
@@ -375,37 +440,44 @@ public:
         return val;
     }
     iterator():
-        type(0),
+        gpointer(0),
         val(0),
         valid(0)
     {   
     }
-    iterator(list * a, list * b):
-        type(b),
+    iterator(list * a):
         val(a),
         valid(1)
     {
-        val->list_iter.push_back(this);
+        gpointer = a->gpointer;
+        gpointer->cnt++;
+        //val->list_iter.push_back(this);
     }
     
     iterator (iterator const & a):
-        type(a.type),
+        gpointer(a.gpointer),
         val(a.val),
         valid(a.valid)
     {
         if (valid)
-            val->list_iter.push_back(this);
+        {
+            //val->list_iter.push_back(this);
+            gpointer->cnt++;
+        }
     }
     
     iterator & operator = (iterator const & a)
     {
         if (valid)
             clear_i();
-        type = a.type,
+        gpointer = a.gpointer;
         val = a.val,
         valid = a.valid;
         if (valid)
-            val->list_iter.push_back(this);
+        {
+            //val->list_iter.push_back(this);
+            gpointer->cnt++;
+        }
         return *this;
     }
     
@@ -413,54 +485,67 @@ public:
     {
         assert(valid);
         assert(!(val->is_end));
+        assert(check());
         clear_i();
         val = val->next;
-        val->list_iter.push_back(this);
+        //val->list_iter.push_back(this);
+        push_i();
         return *this;
     }
     iterator & operator -- ()
     {
         assert(valid);
         assert(!(val->prev->is_end));
+        assert(check());
         clear_i();
         val = val->prev;
-        val->list_iter.push_back(this);
+        push_i();
+        //val->list_iter.push_back(this);
         return *this;
     }
     iterator operator ++ (int)
     {
         assert(valid);
         assert(!(val->is_end));
+        assert(check());
         clear_i();
         val = val->next;
-        val->list_iter.push_back(this);
-        return iterator (val->prev, type);
+        push_i();
+        //val->list_iter.push_back(this);
+        return iterator (val->prev);
     }
     iterator operator -- (int)
     {
         assert(valid);
         assert(!(val->prev->is_end));
+        assert(check());
         clear_i();
         val = val->prev;
-        val->list_iter.push_back(this);
-        return iterator (val->next, type);
+        push_i();
+        //val->list_iter.push_back(this);
+        return iterator (val->next);
     }
     T & operator * ()
     {
         assert(valid);
         assert(!(val->is_end));
+        assert(check());
         return static_cast <node <T> *> (val)->val;
     }
     friend bool operator != (iterator const & b, iterator const & a)
     {
         assert(a.valid);
         assert(b.valid);
+        assert(a.check());
+        assert(b.check());
         return a.val != b.val;
     }
     friend bool operator == (iterator const & a, iterator const & b)
     {
         assert(a.valid);
         assert(b.valid);
+        assert(a.check());
+        assert(b.check());
         return a.val == b.val;
     }
     ~iterator ()
@@ -474,16 +559,41 @@ template <typename T> struct list <T>::
 const_iterator
 {
 private:
-    list * type;
+    global <T> * gpointer;
+    //list * type;
     list /*const*/ * val;
     bool valid;
+    bool check() const
+    {
+        if (!valid || gpointer == 0)
+            return 0;
+        return gpointer->valid;
+    }
+    void push_i()
+    {
+        if (!valid || gpointer == 0)
+        {
+            gpointer->cnt--;
+            if (gpointer->cnt == 0)
+                delete gpointer;
+        }
+        gpointer = val->gpointer;
+        gpointer->cnt++;
+    }
     void clear_i()
     {
+        /*
         std::vector <const_iterator *> tmp;
         for (typename std::vector <const_iterator *> :: iterator i = val->list_c_iter.begin(); i != val->list_c_iter.end(); ++i)
             if ((*i) != this)
                 tmp.push_back(*i);
         val->list_c_iter = tmp;
+        */
+        if (!valid || gpointer == 0)
+            return;
+        gpointer->cnt--;
+        if (gpointer->cnt == 0)
+            delete gpointer;
     }
 public:
     typedef const T value_type;
@@ -495,97 +605,120 @@ public:
     {
         return const_cast <list *> (val);
     }
-    const_iterator(/*const*/ list * a, list * b):
-        type(b),
+    const_iterator(/*const*/ list * a):
+        gpointer(a->gpointer),
         val(a),
         valid(1)
     {
-        val->list_c_iter.push_back(this);
+        gpointer->cnt++;
+        //val->list_c_iter.push_back(this);
     }
     const_iterator():
-        type(0),
+        gpointer(nullptr),
         val(0),
         valid(0)
     {}
     const_iterator(iterator const & a):
-        type(a.type),
+        gpointer(a.gpointer),
         val(a.get()),
         valid(a.valid)
     {
         if (valid)
-            val->list_c_iter.push_back(this);
+        {
+            gpointer->cnt++;
+            //val->list_c_iter.push_back(this);
+        }
     }
     const_iterator (const_iterator const & a):
-        type(a.type),
+        gpointer(a.gpointer),
         val(a.val),
         valid(a.valid)
     {
         if (valid)
-            val->list_c_iter.push_back(this);
+        {
+            gpointer->cnt++;
+            //val->list_c_iter.push_back(this);
+        }
     }
     const_iterator & operator = (const_iterator const & a)
     {
         if (valid)
             clear_i();
-        type = a.type,
         val = a.val,
         valid = a.valid;
+        gpointer = a.gpointer;
         if (valid)
-            val->list_c_iter.push_back(this);
+        {
+            //val->list_c_iter.push_back(this);
+            gpointer->cnt++;
+        }
         return *this;
     }
     const_iterator operator ++ ()
     {
         assert(valid);
         assert(!(val->is_end));
+        assert(check());
         clear_i();
         val = static_cast <list <T> *> (val->next);
-        val->list_c_iter.push_back(this);
-        return const_iterator (val, type);
+        push_i();
+        //val->list_c_iter.push_back(this);
+        return const_iterator (val);
     }
     const_iterator operator -- ()
     {
         assert(valid);
         assert(!(val->prev->is_end));
+        assert(check());
         clear_i();
         val = val->prev;
-        val->list_c_iter.push_back(this);
-        return const_iterator (val, type);
+        push_i();
+        //val->list_c_iter.push_back(this);
+        return const_iterator (val);
     }
     const_iterator operator ++ (int)
     {
         assert(valid);
         assert(!(val->is_end));
+        assert(check());
         clear_i();
         val = val->next;
-        val->list_c_iter.push_back(this);
-        return const_iterator (val->prev, type);
+        push_i();
+        //val->list_c_iter.push_back(this);
+        return const_iterator (val->prev);
     }
     const_iterator operator -- (int)
     {
         assert(valid);
         assert(!(val->prev->is_end));
+        assert(check());
         clear_i();
         val = val->prev;
-        val->list_c_iter.push_back(this);
-        return const_iterator (val->next, type);
+        push_i();
+        //val->list_c_iter.push_back(this);
+        return const_iterator (val->next);
     }
     friend bool operator != (const_iterator const & a, const_iterator const & b)
     {
         assert(a.valid);
         assert(b.valid);
+        assert(a.check());
+        assert(b.check());
         return a.val != b.val;
     }
     friend bool operator == (const_iterator const & a, const_iterator const & b)
     {
         assert(a.valid);
         assert(b.valid);
+        assert(a.check());
+        assert(b.check());
         return a.val == b.val;
     }
     T const & operator * ()
     {
         assert(valid);
         assert(!(val->is_end));
+        assert(check());
         return static_cast <node <T> const *> (val)->val;
     }
     friend struct list;
@@ -600,10 +733,11 @@ struct node : list <T>
 {
 public:
     T val;
-    node (T const & a):
+    node (T const & a, list <T> * root_):
         list <T> :: list(),
         val(a)
     {
         list <T> :: is_end = 0;
+        list <T> :: gpointer->type = root_;
     }
 };
