@@ -484,8 +484,8 @@ public:
     iterator & operator ++ ()
     {
         assert(valid);
-        assert(!(val->is_end));
         assert(check());
+        assert(!(val->is_end));
         clear_i();
         val = val->next;
         //val->list_iter.push_back(this);
@@ -495,8 +495,8 @@ public:
     iterator & operator -- ()
     {
         assert(valid);
-        assert(!(val->prev->is_end));
         assert(check());
+        assert(!(val->prev->is_end));
         clear_i();
         val = val->prev;
         push_i();
@@ -506,8 +506,8 @@ public:
     iterator operator ++ (int)
     {
         assert(valid);
-        assert(!(val->is_end));
         assert(check());
+        assert(!(val->is_end));
         clear_i();
         val = val->next;
         push_i();
@@ -517,8 +517,8 @@ public:
     iterator operator -- (int)
     {
         assert(valid);
-        assert(!(val->prev->is_end));
         assert(check());
+        assert(!(val->prev->is_end));
         clear_i();
         val = val->prev;
         push_i();
@@ -528,8 +528,8 @@ public:
     T & operator * ()
     {
         assert(valid);
-        assert(!(val->is_end));
         assert(check());
+        assert(!(val->is_end));
         return static_cast <node <T> *> (val)->val;
     }
     friend bool operator != (iterator const & b, iterator const & a)
@@ -657,8 +657,8 @@ public:
     const_iterator operator ++ ()
     {
         assert(valid);
-        assert(!(val->is_end));
         assert(check());
+        assert(!(val->is_end));
         clear_i();
         val = static_cast <list <T> *> (val->next);
         push_i();
@@ -668,8 +668,8 @@ public:
     const_iterator operator -- ()
     {
         assert(valid);
-        assert(!(val->prev->is_end));
         assert(check());
+        assert(!(val->prev->is_end));
         clear_i();
         val = val->prev;
         push_i();
@@ -679,8 +679,8 @@ public:
     const_iterator operator ++ (int)
     {
         assert(valid);
-        assert(!(val->is_end));
         assert(check());
+        assert(!(val->is_end));
         clear_i();
         val = val->next;
         push_i();
@@ -690,8 +690,8 @@ public:
     const_iterator operator -- (int)
     {
         assert(valid);
-        assert(!(val->prev->is_end));
         assert(check());
+        assert(!(val->prev->is_end));
         clear_i();
         val = val->prev;
         push_i();
@@ -717,8 +717,8 @@ public:
     T const & operator * ()
     {
         assert(valid);
-        assert(!(val->is_end));
         assert(check());
+        assert(!(val->is_end));
         return static_cast <node <T> const *> (val)->val;
     }
     friend struct list;
