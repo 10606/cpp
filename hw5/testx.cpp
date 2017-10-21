@@ -105,9 +105,12 @@ int main() {
     tmp0.insert(std::move(not_copy(2)));
     std::cout << tmp << std::endl;
     std::cout << tmp0 << std::endl;
+    tmp = tmp0;
     tmp0.erase(++++tmp0.begin());
     std::cout << tmp << std::endl;
     std::cout << tmp0 << std::endl;
+    persistent_set <not_copy> :: iterator i = tmp0.end();
+    std::cout << *(--i) << std::endl;
     
 
     auto r2 = test<persistent_set<int, linked_ptr>>("linked_ptr");

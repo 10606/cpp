@@ -332,6 +332,18 @@ public:
     // Декремент невалидного итератора неопределен.
     iterator& operator--()
     {
+        if (path.empty())
+        {
+            node * tmp = root->left.get();
+            path.push_back(tmp);
+            while(tmp->rigth.get() != nullptr)
+            {
+                tmp = tmp->rigth.get();
+                path.push_back(tmp);
+            }
+            return *this;
+            
+        }
         if ((!path.empty()) && (path.back()->left.get() != nullptr))
         {
             node * tmp = path.back()->left.get();
