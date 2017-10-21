@@ -51,7 +51,7 @@ private:
             endi(ei_)
         {}
     };
-    quard find_build(T const & a) //pos, (start_path end_path) pos copy
+    quard find_build(T const & a) const//pos, (start_path end_path) pos copy
     {
         ptr <node> start;
         ptr <node> endp;
@@ -270,7 +270,7 @@ struct persistent_set<T, ptr>::iterator
     friend struct persistent_set;
 private:
     std::vector <node *> path;
-    persistent_set <T, ptr> * root;
+    persistent_set <T, ptr> const * root;
 
 public:
     iterator():
