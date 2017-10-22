@@ -92,4 +92,5 @@ public:
     friend big_integer & operator >>= (big_integer & a, big_integer const & b);
     friend std::string to_string(big_integer);
     friend std::ostream & operator << (std::ostream & s, big_integer const & a);
+    friend void to_fit(big_integer & a);
 };

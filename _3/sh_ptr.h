@@ -32,11 +32,15 @@ public:
             delete [] val;
         }
     }
-    sh_ptr(uint32_t * val_):
+    sh_ptr(uint32_t * val_) try:
         val(val_),
         cnt(new size_t)
     {
         *cnt = 1;
+    }
+    catch (...)
+    {
+        delete [] val_;
     }
     uint32_t * get()
     {
@@ -44,6 +48,15 @@ public:
     }
     void reset(uint32_t * val_)
     {
+        size_t * tmp;
+        try
+        {
+            tmp = new size_t;
+        }
+        catch (...)
+        {
+            delete [] val_;
+        }
         if (cnt != 0)
             --(*cnt);
         if (cnt != 0 && *cnt == 0)
@@ -52,7 +65,7 @@ public:
             delete [] val;
         }
         val = val_;
-        cnt = new size_t;
+        cnt = tmp;
         *cnt = 1;
     }
     void reset(sh_ptr const & a)
@@ -72,8 +85,15 @@ public:
     void set(uint32_t * val_)
     {
         val = val_;
-        cnt = new size_t;
-        *cnt = 1;
+        try
+        {
+            cnt = new size_t;
+            *cnt = 1;
+        }
+        catch (...)
+        {
+            delete [] val_;
+        }
     }
     void set(sh_ptr const & a)
     {

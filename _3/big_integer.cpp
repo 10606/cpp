@@ -6,6 +6,26 @@
 #include <memory>
 #include "big_integer.h"
 
+void to_fit(big_integer & a)
+{
+    if (a.size <= 4)
+        return;
+    size_t pos = 1;
+    for (size_t i = 0; i != a.size; ++i)
+    {
+        if (a.data.big.get()[i] != 0)
+            pos = i + 1;
+    }
+    if (pos > 4)
+        return;
+    uint32_t tmp[4];
+    for (size_t i = 0; i != pos; ++i)
+        tmp[i] = a.data.big.get()[i];
+    a.size = pos;
+    a.data.big.~sh_ptr();
+    for (size_t i = 0; i != pos; ++i)
+        a.data.small[i] = tmp[i];
+}
 void big_integer::big_small::assign (const big_small & a, bool t1, bool t2)//1 - big
 {
     if (t1)
@@ -163,6 +183,7 @@ big_integer & operator -- (big_integer & aa)
         }
     }
     aa.signed_ = a.signed_;
+    to_fit(aa);
     return aa;
 }
 big_integer operator -- (big_integer & aa, int)
@@ -185,6 +206,8 @@ big_integer operator -- (big_integer & aa, int)
         big_integer_no::inc_postfix(a, res);
     std::swap(aa, tmp);
     aa.signed_ = a.signed_;
+    to_fit(aa);
+    to_fit(tmp);
     return aa;
 }
 big_integer & operator ++ (big_integer & aa)
@@ -212,6 +235,7 @@ big_integer & operator ++ (big_integer & aa)
     else
         big_integer_no::dec_prefix(a);
     aa.signed_ = a.signed_;
+    to_fit(aa);
     return aa;
 }
 big_integer operator ++ (big_integer & aa, int)
@@ -234,6 +258,8 @@ big_integer operator ++ (big_integer & aa, int)
         big_integer_no::dec_postfix(a, res);
     std::swap(aa, tmp);
     aa.signed_ = a.signed_;
+    to_fit(aa);
+    to_fit(tmp);
     return aa;
 }
 bool operator == (big_integer aa, big_integer bb)
@@ -286,6 +312,7 @@ big_integer operator - (big_integer aa, big_integer bb)
     big_integer_no res(cast_param(tmp));
     big_integer_no::pre_add(a, b, 1, res);
     tmp.signed_ = res.signed_;
+    to_fit(tmp);
     return tmp;
 }
 big_integer operator + (big_integer aa, big_integer bb)
@@ -302,6 +329,7 @@ big_integer operator + (big_integer aa, big_integer bb)
     big_integer_no res(cast_param(tmp));
     big_integer_no::pre_add(a, b, 0, res);
     tmp.signed_ = res.signed_;
+    to_fit(tmp);
     return tmp;
 }
 big_integer operator * (big_integer aa, big_integer bb)
@@ -320,6 +348,7 @@ big_integer operator * (big_integer aa, big_integer bb)
     tmp.signed_ = a.signed_ ^ b.signed_;
     for (i = 0; i != b.size; ++i)
         big_integer_no::add_mul(res, a, b.data.data[i], i);
+    to_fit(tmp);
     return tmp;
 }
 big_integer operator / (big_integer aa, big_integer bb)
@@ -334,7 +363,7 @@ big_integer operator / (big_integer aa, big_integer bb)
     bb *= static_cast <uint32_t> (norm);
     big_integer_no a(cast_param(aa));
     big_integer_no b(cast_param(bb));
-    uint32_t d;
+    uint32_t d = 0;
     size_t pos = 0;
     for (size_t i = 0; i != b.size; ++i)
         if (b.data.data[i] != 0)
@@ -351,6 +380,7 @@ big_integer operator / (big_integer aa, big_integer bb)
     big_integer_no res(cast_param(tmp));
     big_integer_no::div_bb(a, b, res, d, pos);
     tmp.signed_ = res.signed_;
+    to_fit(tmp);
     return tmp;
 }
 big_integer operator % (big_integer a, big_integer b)
@@ -370,6 +400,7 @@ big_integer operator ^ (big_integer aa, big_integer bb)
     big_integer_no res(cast_param(tmp));
     big_integer_no::bin_bb(a, b, &big_integer_no::func_xor, res);
     tmp.signed_ = res.signed_;
+    to_fit(tmp);
     return tmp;
 }
 big_integer operator | (big_integer aa, big_integer bb)
@@ -385,6 +416,7 @@ big_integer operator | (big_integer aa, big_integer bb)
     big_integer_no res(cast_param(tmp));
     big_integer_no::bin_bb(a, b, &big_integer_no::func_or, res);
     tmp.signed_ = res.signed_;
+    to_fit(tmp);
     return tmp;
 }
 big_integer operator & (big_integer aa, big_integer bb)
@@ -400,6 +432,7 @@ big_integer operator & (big_integer aa, big_integer bb)
     big_integer_no res(cast_param(tmp));
     big_integer_no::bin_bb(a, b, &big_integer_no::func_and, res);
     tmp.signed_ = res.signed_;
+    to_fit(tmp);
     return tmp;
 }
 const big_integer operator ~ (big_integer a)
@@ -424,6 +457,7 @@ big_integer operator << (big_integer aa, big_integer bb)
         big_integer_no::set_zero(res);
         big_integer_no::shl_bb(a, b.data.data[0], res);
         tmp.signed_ = res.signed_;
+        to_fit(tmp);
         return tmp;
     }
     else
@@ -452,6 +486,7 @@ big_integer operator << (big_integer aa, big_integer bb)
             big_integer_no::shr_bb(a, b.data.data[0], res);
             tmp = ~tmp;
         }
+        to_fit(tmp);
         return tmp;
     }
 }
@@ -483,6 +518,7 @@ big_integer operator >> (big_integer aa, big_integer bb)
             big_integer_no::shr_bb(a, b.data.data[0], res);
             tmp = ~tmp;
         }
+        to_fit(tmp);
         return tmp;
     }
     else
@@ -499,6 +535,7 @@ big_integer operator >> (big_integer aa, big_integer bb)
         big_integer_no::set_zero(res);
         big_integer_no::shl_bb(a, b.data.data[0], res);
         tmp.signed_ = res.signed_;
+        to_fit(tmp);
         return tmp;
     }
 }
