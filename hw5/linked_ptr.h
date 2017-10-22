@@ -11,20 +11,20 @@ private:
     linked_ptr <T> const mutable * left, * rigth;
 
 public:
-    linked_ptr ():
+    linked_ptr () noexcept:
         data(nullptr),
         left(this),
         rigth(this)
     {}
 
-    linked_ptr (T * a):
+    linked_ptr (T * a) noexcept:
         linked_ptr() 
     {
         data = a;
     }
 
     
-    linked_ptr (linked_ptr const & a):
+    linked_ptr (linked_ptr const & a) noexcept:
         data(a.data),
         left(&a),
         rigth(a.rigth)

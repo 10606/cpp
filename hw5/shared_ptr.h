@@ -21,11 +21,11 @@ private:
     pack * ptr;
 
 public:
-    shared_ptr ():
+    shared_ptr () noexcept:
         ptr(nullptr)
     {}
     
-    shared_ptr (shared_ptr const & a):
+    shared_ptr (shared_ptr const & a) noexcept:
         ptr(a.ptr)
     {
         if (ptr != nullptr)

@@ -208,8 +208,6 @@ public:
                 endi.path.push_back(tmp.get());
             }
         }
-        if (*(tmp.get()->value.get()) != a)
-            return end();
         return endi;
     }
 
@@ -250,8 +248,6 @@ public:
     {
         quard path = find_build(*(a.path.back()->value.get()));
         bool tmp = !(a.path.size() == 1 || a.path[a.path.size() - 2]->left.get() == a.path.back());
-        if (path.start.get() == nullptr)
-            return;
         left = path.start;
         if (path.pre_endp.get() == nullptr)
         {
