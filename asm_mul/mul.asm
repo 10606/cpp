@@ -181,9 +181,9 @@ mul_long_long:
                 sub             rsp, rax
                 ;sub             rsp, 1024
                 mov             rbp, rsp
-                xchg            rsi, rbp ;swap
+                xchg            rsi, rbp
                 call            rewrite
-                ; rbp - new sequence = rdi, rdi = 0  
+                ; rbp - new sequence = rdi, rdi = 0 !not ready! 
 .loop:
                 mov             rbx, [rbp]
                 call            add_mul_long_short
