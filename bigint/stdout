@@ -1,0 +1,11 @@
+==21725== HEAP SUMMARY:
+==21725==     in use at exit: 6 bytes in 2 blocks
+==21725==   total heap usage: 4 allocs, 2 frees, 73,734 bytes allocated
+==21725==
+==21725== LEAK SUMMARY:
+==21725==    definitely lost: 6 bytes in 2 blocks
+==21725==    indirectly lost: 0 bytes in 0 blocks
+==21725==      possibly lost: 0 bytes in 0 blocks
+==21725==    still reachable: 0 bytes in 0 blocks
+==21725==         suppressed: 0 bytes in 0 blocks
+

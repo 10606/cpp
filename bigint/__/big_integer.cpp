@@ -13,14 +13,14 @@ big_integer::big_integer ():
 }
 big_integer::~big_integer()
 {
-    if (size > 0)
-        delete [] data.data;
+    //if (size > 0)
+    //    delete [] data.data;
 }
 big_integer::big_integer (big_integer const & a)
 {
     size = a.size;
     signed_ = a.signed_;
-    data = big_obj(a.size);
+    data = big_obj(a.data.capacity);
     for (size_t i = 0; i != size; ++i)
         data.data[i] = a.data.data[i];
 }
@@ -29,7 +29,7 @@ big_integer::big_integer (int32_t val):
     signed_(val < 0),
     data(1)
 {
-    data.data[0] = (val < 0) ? (-static_cast <uint32_t> (val)) : (static_cast <uint32_t> (val));
+    data.data[0] = (val < 0) ? (static_cast <uint32_t> (-val)) : (static_cast <uint32_t> (val));
 }
 big_integer::big_integer (std::string s):
     size((s.size() + 8) / 9),
@@ -47,15 +47,16 @@ big_integer::big_integer (std::string s):
 }
 big_integer & big_integer::operator = (big_integer const & a)
 {
-    swap(a);
+    if (a.data.data == data.data)
+        return *this;
+    //if (size > 0)
+    //    delete [] (data.data);
+    size = a.size;
+    data = big_obj(a.size);
+    signed_ = a.signed_;
+    for  (size_t i = 0; i != a.size; ++i)
+        data.data[i] = a.data.data[i];
     return (*this);
-}
-void big_integer::set_size(big_integer & a, size_t siz)
-{
-    if (a.size > 0)
-        delete [] a.data.data;
-    a.size = siz;
-    a.data = big_obj(siz);
 }
 inline std::pair<bool, uint32_t> const big_integer::add(uint32_t const & a, uint32_t const & b, bool cf_)
 {
@@ -71,15 +72,15 @@ inline std::pair<uint32_t, uint32_t> const big_integer::mul(uint32_t const & a, 
 }
 inline bool big_integer::check_resize_bb(big_integer const & a, big_integer const & b)
 {
-    if (b.data.data[b.size - 1] >= c01_)
+    if (b.data.data[b.size - 1] < c11_ && b.data.data[b.size - 1] >= c01_)
         return 1;
-    if (a.data.data[a.size - 1] >= c01_)
+    if (a.data.data[b.size - 1] < c11_ && a.data.data[b.size - 1] >= c01_)
         return 1;
     return 0;
 }
 inline big_integer const big_integer::add_bb (big_integer const & a, big_integer const & b, bool negate)
 {
-    bool need_resize = big_integer::check_resize_bb(a, b) & !negate;
+    bool need_resize = big_integer::check_resize_bb(a, b);
     big_integer res;
     size_t max_size = std::max(a.size, b.size) + need_resize;
     big_integer::set_size(res, max_size);
@@ -241,13 +242,107 @@ bool big_integer::comp_fb(big_integer const & a, big_integer const & b)
     bool f = 0;
     for (size_t i = min_size - 1; i < min_size; --i)
     {
-        if (a.data.data[i] != b.data.data[i]) 
-        {
+        if (a.data.data[i] != b.data.data[i]) {
             f = a.data.data[i] > b.data.data[i];
             break;
         }
     }
     return (fb && (fa || f));
+}
+inline big_integer big_integer::bin_bb(big_integer const & a, big_integer const & b, uint32_t (*func) (uint32_t, uint32_t)) 
+{
+    big_integer res;
+    size_t max_size = std::max(a.size, b.size);
+    big_integer::set_size(res, max_size);
+    uint32_t ca_ = a.signed_ != 0;
+    uint32_t xa_ = (a.signed_ != 0)? big_integer::a11_ : big_integer::a00_;
+    uint32_t cb_ = b.signed_ != 0;
+    uint32_t xb_ = (b.signed_ != 0)? big_integer::a11_ : big_integer::a00_;
+    for (size_t i = 0; i != std::min(a.size, b.size); ++i)
+    {
+        res.data.data[i] = func((a.data.data[i] ^ xa_) + ca_, (b.data.data[i] ^ xb_) + cb_);
+        ca_ &= a.data.data[i] == 0;
+        cb_ &= b.data.data[i] == 0;
+    }
+    if (c1_ & res.data.data[res.size - 1])
+    {
+        res.signed_ = 1;
+        bool cr_ = 1;
+        for (size_t i = 0; i != res.size; ++i)
+        {
+            res.data.data[i] = (res.data.data[i] ^ a11_) + cr_;
+            cr_ &= res.data.data[i] == 0;
+        }
+    }
+    return res;
+}    
+inline uint32_t big_integer::func_or (uint32_t a_, uint32_t b_) 
+{
+    return a_ | b_;
+}
+inline uint32_t big_integer::func_and (uint32_t a_, uint32_t b_) 
+{
+    return a_ & b_;
+}
+inline uint32_t big_integer::func_xor (uint32_t a_, uint32_t b_) 
+{
+    return a_ ^ b_;
+}
+inline big_integer big_integer::xor_bb(big_integer const & a, big_integer const & b) 
+{
+    return big_integer::bin_bb(a, b, &func_xor);
+}
+inline big_integer big_integer::and_bb(big_integer const & a, big_integer const & b) 
+{
+    return big_integer::bin_bb(a, b, &func_and);
+}
+inline big_integer big_integer::or_bb(big_integer const & a, big_integer const & b) 
+{    
+    return big_integer::bin_bb(a, b, (&func_or));
+}
+std::string to_string(big_integer const & ss)
+{
+    big_integer s(ss);
+    if (big_integer::check_zero(s))
+        return "0";
+    std::string res = "";
+    size_t max_size = s.size * 10;
+    for (size_t i = 0; i != max_size; ++i)
+    {
+        uint32_t reminder = big_integer::div_asign(s, 10);
+        res.push_back(static_cast <char> (reminder + '0'));
+    }
+    for (size_t i = max_size - 1; i < max_size && res[i] == '0'; --i)
+    {
+        res.pop_back();
+    }
+    if (res.size() == 0)
+        res = "0";
+    max_size = res.size();
+    for (size_t i = 0; i != (max_size / 2); ++i)
+    {
+        std::swap(res[i], res[max_size - i - 1]);
+    }
+    if (s.signed_)
+        res = "-" + res;
+    return res;
+}
+inline big_integer big_integer::string_to_bi(std::string const & s)
+{
+    big_integer res;
+    size_t max_size = (s.size() + 8) / 9;
+    big_integer::set_size(res, max_size);
+    big_integer::set_zero(res);
+    if (s.size() == 0)
+        return res;
+    res.signed_ = (s[0] == '-');
+    size_t i = (s[0] == '-') ? 1 : 0;
+    for (; i != s.size(); ++i)
+    {
+        big_integer::mul_asign(res, 10);
+        big_integer::add_asign(res, static_cast <uint32_t> (s[i] - '0'));
+    }
+    return res;
 }
 void big_integer::sub_mul(big_integer & a, const big_integer & b, const uint32_t & c, const size_t & pos)
 {
@@ -294,19 +389,10 @@ bool big_integer::check_abecb(const big_integer & a, const big_integer & b, cons
     flag &= (sub == 0);
     return flag;
 }
-inline big_integer big_integer::div_bb(big_integer & reminder, big_integer b, bool type)
+inline big_integer big_integer::div_bb(big_integer & reminder, big_integer const & b, bool type)
 {
     uint64_t digit = 0, d = 0; 
     size_t pos = 0;
-    for (size_t i = 0; i != b.size; ++i)
-        if (b.data.data[i] != 0)
-        {
-            pos = i;
-            d = b.data.data[i];
-        }
-    uint64_t norm = std::max((static_cast <uint64_t> (big_integer::a11_) / (d + 1)), static_cast <uint64_t> (1));
-    reminder *= norm;
-    b *= norm;
     for (size_t i = 0; i != b.size; ++i)
         if (b.data.data[i] != 0)
         {
@@ -323,11 +409,24 @@ inline big_integer big_integer::div_bb(big_integer & reminder, big_integer b, bo
     for (size_t i = res.size - 1; i < res.size; --i)
     {
         digit |= reminder.data.data[i + pos];
-        uint64_t r = std::min(digit / d, static_cast <uint64_t> (big_integer::a11_));
-        while (!(big_integer::check_abecb(reminder, b, r, i)))
+        uint64_t l = a00_;
+        uint64_t r = a11_;
+        r = std::min(digit / d, static_cast <uint64_t> (big_integer::a11_));
+        l = (d == big_integer::a11_) ? (r - 1) : (digit / (d + 1));
+        uint64_t m;
+        while (r - l > 1)
+        {
+            m = (r + l) / 2;
+            if (big_integer::check_abecb(reminder, b, m, i))
+                l = m;
+            else
+                r = m;
+        }
+        if (!(big_integer::check_abecb(reminder, b, r, i)))
             r--;
-        res.data.data[i] = r;
-        sub_mul(reminder, b, r, i);
+        l = r;
+        res.data.data[i] = l;
+        sub_mul(reminder, b, l, i);
         digit = static_cast <uint64_t> (reminder.data.data[i + pos]) << 32;
     }
     if (!type)
@@ -376,6 +475,8 @@ inline big_integer & big_integer::shl_bb(big_integer & a, uint32_t b)
 inline big_integer big_integer::dec_postfix(big_integer & a)
 {
     size_t max_size = a.size;
+    if (a.data.data[a.size - 1] & big_integer::c11_)
+        ++max_size;
     big_integer res;
     res.signed_ = a.signed_;
     set_size(res, max_size);
@@ -398,20 +499,46 @@ inline big_integer big_integer::dec_postfix(big_integer & a)
 }
 inline big_integer & big_integer::dec_prefix(big_integer & a)
 {
-    bool cf = 1;
-    for (size_t i = 0; i != a.size && cf; ++i)
+    if (a.data.data[a.size - 1] & big_integer::c11_)
     {
-        --a.data.data[i];
-        cf = a.data.data[i] == a11_;
+        big_integer res;
+        res.signed_ = a.signed_;
+        size_t max_size = a.size + 1;
+        set_size(res, max_size);
+        set_zero(res);
+        bool cf = 1;
+        for (size_t i = 0; i != res.size && cf; ++i)
+        {
+            res.data.data[i] = a.data.data[i] - 1;
+            cf = res.data.data[i] == big_integer::a11_;
+        }
+        if (cf)
+        {
+            for (size_t i = 0; i != res.size && cf; ++i)
+                res.data.data[i] = 0;
+            res.data.data[0] = 1;
+            res.signed_ = !res.signed_;
+        }
+        a = res;
+        return a;
     }
-    if (cf)
+    else
     {
+        bool cf = 1;
         for (size_t i = 0; i != a.size && cf; ++i)
-            a.data.data[i] = 0;
-        a.data.data[0] = 1;
-        a.signed_ = !a.signed_;
+        {
+            --a.data.data[i];
+            cf = a.data.data[i] == a11_;
+        }
+        if (cf)
+        {
+            for (size_t i = 0; i != a.size && cf; ++i)
+                a.data.data[i] = 0;
+            a.data.data[0] = 1;
+            a.signed_ = !a.signed_;
+        }
+        return a;
     }
-    return a;
 }
 inline big_integer big_integer::inc_postfix(big_integer & a)
 {
@@ -460,69 +587,14 @@ inline big_integer & big_integer::inc_prefix(big_integer & a)
         return a;
     }
 }
-inline big_integer big_integer::bin_bb(big_integer const & a, big_integer const & b, uint32_t (*func) (uint32_t const &, uint32_t const &)) 
+void big_integer::set_size(big_integer & a, size_t siz)
 {
-    big_integer res;
-    size_t max_size = std::max(a.size, b.size);
-    big_integer::set_size(res, max_size);
-    uint32_t ca_ = a.signed_ != 0;
-    uint32_t xa_ = (a.signed_ != 0)? big_integer::a11_ : big_integer::a00_;
-    uint32_t cb_ = b.signed_ != 0;
-    uint32_t xb_ = (b.signed_ != 0)? big_integer::a11_ : big_integer::a00_;
-    for (size_t i = 0; i != std::min(a.size, b.size); ++i)
-    {
-        res.data.data[i] = func((a.data.data[i] ^ xa_) + ca_, (b.data.data[i] ^ xb_) + cb_);
-        ca_ &= a.data.data[i] == 0;
-        cb_ &= b.data.data[i] == 0;
-    }
-    if (c1_ & res.data.data[res.size - 1])
-    {
-        res.signed_ = 1;
-        bool cr_ = 1;
-        for (size_t i = 0; i != res.size; ++i)
-        {
-            res.data.data[i] = (res.data.data[i] ^ a11_) + cr_;
-            cr_ &= res.data.data[i] == 0;
-        }
-    }
-    return res;
-}    
-std::string to_string(big_integer const & ss)
-{
-    big_integer s(ss);
-    if (big_integer::check_zero(s))
-        return "0";
-    std::string res = "";
-    size_t max_size = s.size * 10;
-    for (size_t i = 0; i != max_size; ++i)
-    {
-        uint32_t reminder = big_integer::div_asign(s, 10);
-        res.push_back(static_cast <char> (reminder + '0'));
-    }
-    for (size_t i = max_size - 1; i < max_size && res[i] == '0'; --i)
-        res.pop_back();
-    if (res.size() == 0)
-        res = "0";
-    max_size = res.size();
-    for (size_t i = 0; i != (max_size / 2); ++i)
-        std::swap(res[i], res[max_size - i - 1]);
-    if (s.signed_)
-        res = "-" + res;
-    return res;
+    //if (a.size > 0)
+    //    delete [] a.data.data;
+    a.size = siz;
+    a.data = big_obj(siz);
 }
-inline uint32_t big_integer::func_or (uint32_t const & a_, uint32_t const & b_) 
-{
-    return a_ | b_;
-}
-inline uint32_t big_integer::func_and (uint32_t const & a_, uint32_t const & b_) 
-{
-    return a_ & b_;
-}
-inline uint32_t big_integer::func_xor (uint32_t const & a_, uint32_t const & b_) 
-{
-    return a_ ^ b_;
-}
-void big_integer::swap (big_integer a)
+void big_integer::swap (big_integer & a)
 {
     std::swap(size, a.size);
     std::swap(signed_, a.signed_);
@@ -599,7 +671,9 @@ bool operator >= (big_integer a, big_integer b)
 big_integer operator - (big_integer a, big_integer b)
 {
     if (a.signed_ != b.signed_)
+    {
         return big_integer::add_bb(a, b, 0);
+    }
     else
     {
         if (big_integer::comp_fb(a, b))
@@ -614,7 +688,9 @@ big_integer operator - (big_integer a, big_integer b)
 big_integer operator + (big_integer a, big_integer b)
 {
     if (a.signed_ == b.signed_)
+    {
         return big_integer::add_bb(a, b, 0);
+    }
     else
     {
         if (big_integer::comp_fb(a, b))
@@ -625,15 +701,7 @@ big_integer operator + (big_integer a, big_integer b)
 }
 big_integer operator * (big_integer a, big_integer b)
 {
-    big_integer res;
-    size_t max_size = a.size + b.size;
-    big_integer::set_size(res, max_size);
-    big_integer::set_zero(res);
-    size_t i;
-    res.signed_ = a.signed_ ^ b.signed_;
-    for (i = 0; i != b.size; ++i)
-        big_integer::add_mul(res, a, b.data.data[i], i);
-    return res;
+    return big_integer::mul_bb(a, b);
 }
 big_integer operator / (big_integer a, big_integer b)
 {
@@ -641,19 +709,19 @@ big_integer operator / (big_integer a, big_integer b)
 }
 big_integer operator % (big_integer a, big_integer b)
 {
-    return (a - a / b * b);
+    return big_integer::div_bb(a, b, 1);
 }
 big_integer operator ^ (big_integer a, big_integer b)
 {
-    return big_integer::bin_bb(a, b, &big_integer::func_xor);
+    return big_integer::xor_bb(a, b);
 }
 big_integer operator | (big_integer a, big_integer b)
 {
-    return big_integer::bin_bb(a, b, &big_integer::func_or);
+    return big_integer::or_bb(a, b);
 }
 big_integer operator & (big_integer a, big_integer b)
 {
-    return big_integer::bin_bb(a, b, &big_integer::func_and);
+    return big_integer::and_bb(a, b);
 }
 const big_integer operator ~ (big_integer a)
 {

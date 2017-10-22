@@ -1,0 +1,154 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+a00_	big__integer.cpp	/^    static const uint32_t a00_ = 0;$/;"	m	class:big_int	file:
+a00_	big_integer.cpp	/^    static const uint32_t a00_ = 0;$/;"	m	class:big_int	file:
+a00_	bigint.cpp	/^    static const uint32_t a00_ = 0;$/;"	m	class:big_int	file:
+a11_	big__integer.cpp	/^    static const uint32_t a11_ = 0xffffffff;$/;"	m	class:big_int	file:
+a11_	big_integer.cpp	/^    static const uint32_t a11_ = 0xffffffff;$/;"	m	class:big_int	file:
+a11_	bigint.cpp	/^    static const uint32_t a11_ = 0xffffffff;$/;"	m	class:big_int	file:
+add	big__integer.cpp	/^    static inline std::pair<bool, uint32_t> const add(uint32_t const & a, uint32_t const & b, bool cf_ = 0) $/;"	f	class:big_int::std
+add	big_integer.cpp	/^    static inline std::pair<bool, uint32_t> const add(uint32_t const & a, uint32_t const & b, bool cf_ = 0) $/;"	f	class:big_int::std
+add	bigint.cpp	/^    static inline std::pair<bool, uint32_t> const add(uint32_t const & a, uint32_t const & b, bool cf_ = 0) $/;"	f	class:big_int::std	file:
+add_bb	big__integer.cpp	/^    static inline big_int const add_bb (big_int const & a, big_int const & b, bool negate)$/;"	f	class:big_int
+add_bb	big_integer.cpp	/^    static inline big_int const add_bb (big_int const & a, big_int const & b, bool negate)$/;"	f	class:big_int
+add_bb	bigint.cpp	/^    static inline big_int const add_bb (big_int const & a, big_int const & b)$/;"	f	class:big_int	file:
+add_bs	big__integer.cpp	/^    static inline big_int const add_bs (big_int const & a, big_int const & b, bool negate) \/\/a - BIG, b - SMALL$/;"	f	class:big_int
+add_bs	big_integer.cpp	/^    static inline big_int const add_bs (big_int const & a, big_int const & b, bool negate) \/\/a - BIG, b - SMALL$/;"	f	class:big_int
+add_bs	bigint.cpp	/^    static inline big_int const add_bs (big_int const & a, big_int const & b) \/\/a - BIG, b - SMALL$/;"	f	class:big_int	file:
+add_mul	big__integer.cpp	/^    static inline void add_mul(big_int & a, big_int const & b, uint32_t c, size_t pos) \/\/ a BIG shuld has correct size, b BIG  a += (b * c << pos);$/;"	f	class:big_int
+add_mul	big_integer.cpp	/^    static inline void add_mul(big_int & a, big_int const & b, uint32_t c, size_t pos) \/\/ a BIG shuld has correct size, b BIG  a += (b * c << pos);$/;"	f	class:big_int
+add_mul	bigint.cpp	/^    static inline void add_mul(big_int & a, big_int const & b, uint32_t c, size_t pos) \/\/ a BIG shuld has correct size, b BIG  a += (b * c << pos);$/;"	f	class:big_int	file:
+add_sb	big__integer.cpp	/^    static inline big_int const add_sb (big_int const & a, big_int const & b, bool negate) \/\/a - SMALL, b - BIG$/;"	f	class:big_int
+add_sb	big_integer.cpp	/^    static inline big_int const add_sb (big_int const & a, big_int const & b, bool negate) \/\/a - SMALL, b - BIG$/;"	f	class:big_int
+add_sb	bigint.cpp	/^    static inline big_int const add_sb (big_int const & a, big_int const & b) \/\/a - SMALL, b - BIG$/;"	f	class:big_int	file:
+add_ss	big__integer.cpp	/^    static inline big_int const add_ss (big_int const & a, big_int const & b, bool negate)$/;"	f	class:big_int
+add_ss	big_integer.cpp	/^    static inline big_int const add_ss (big_int const & a, big_int const & b, bool negate)$/;"	f	class:big_int
+add_ss	bigint.cpp	/^    static inline big_int const add_ss (big_int const & a, big_int const & b)$/;"	f	class:big_int	file:
+big	big__integer.cpp	/^        big_obj big;$/;"	m	union:big_int::soo	file:
+big	big_integer.cpp	/^        big_obj big;$/;"	m	union:big_int::soo	file:
+big	bigint.cpp	/^        big_obj big;$/;"	m	union:big_int::soo	file:
+big_int	big__integer.cpp	/^    big_int ():$/;"	f	class:big_int
+big_int	big__integer.cpp	/^    big_int (big_int const & a)$/;"	f	class:big_int
+big_int	big__integer.cpp	/^    big_int (std::pair <uint32_t, uint32_t> a):$/;"	f	class:big_int
+big_int	big__integer.cpp	/^    explicit big_int (int32_t val):$/;"	f	class:big_int
+big_int	big__integer.cpp	/^class big_int $/;"	c	file:
+big_int	big_integer.cpp	/^    big_int ():$/;"	f	class:big_int
+big_int	big_integer.cpp	/^    big_int (big_int const & a)$/;"	f	class:big_int
+big_int	big_integer.cpp	/^    big_int (std::pair <uint32_t, uint32_t> a):$/;"	f	class:big_int
+big_int	big_integer.cpp	/^    explicit big_int (int32_t val):$/;"	f	class:big_int
+big_int	big_integer.cpp	/^class big_int $/;"	c	file:
+big_int	bigint.cpp	/^    big_int ():$/;"	f	class:big_int	file:
+big_int	bigint.cpp	/^    big_int (big_int const & a)$/;"	f	class:big_int	file:
+big_int	bigint.cpp	/^    big_int (std::pair <uint32_t, uint32_t> a):$/;"	f	class:big_int	file:
+big_int	bigint.cpp	/^    explicit big_int (int32_t val):$/;"	f	class:big_int	file:
+big_int	bigint.cpp	/^class big_int $/;"	c	file:
+big_obj	big__integer.cpp	/^        big_obj():$/;"	f	struct:big_int::big_obj
+big_obj	big__integer.cpp	/^        big_obj(size_t capacity_): $/;"	f	struct:big_int::big_obj
+big_obj	big__integer.cpp	/^    struct big_obj$/;"	s	class:big_int	file:
+big_obj	big_integer.cpp	/^        big_obj():$/;"	f	struct:big_int::big_obj
+big_obj	big_integer.cpp	/^        big_obj(size_t capacity_): $/;"	f	struct:big_int::big_obj
+big_obj	big_integer.cpp	/^    struct big_obj$/;"	s	class:big_int	file:
+big_obj	bigint.cpp	/^        big_obj():$/;"	f	struct:big_int::big_obj
+big_obj	bigint.cpp	/^        big_obj(size_t capacity_): $/;"	f	struct:big_int::big_obj
+big_obj	bigint.cpp	/^    struct big_obj$/;"	s	class:big_int	file:
+c01_	big__integer.cpp	/^    static const uint32_t c01_ = 0x40000000;$/;"	m	class:big_int	file:
+c01_	big_integer.cpp	/^    static const uint32_t c01_ = 0x40000000;$/;"	m	class:big_int	file:
+c01_	bigint.cpp	/^    static const uint32_t c01_ = 0x40000000;$/;"	m	class:big_int	file:
+c11_	big__integer.cpp	/^    static const uint32_t c11_ = 0xc0000000;$/;"	m	class:big_int	file:
+c11_	big_integer.cpp	/^    static const uint32_t c11_ = 0xc0000000;$/;"	m	class:big_int	file:
+c11_	bigint.cpp	/^    static const uint32_t c11_ = 0xc0000000;$/;"	m	class:big_int	file:
+c1_	big__integer.cpp	/^    static const uint32_t c1_ = 0x80000000;$/;"	m	class:big_int	file:
+c1_	big_integer.cpp	/^    static const uint32_t c1_ = 0x80000000;$/;"	m	class:big_int	file:
+c1_	bigint.cpp	/^    static const uint32_t c1_ = 0x80000000;$/;"	m	class:big_int	file:
+capacity	big__integer.cpp	/^        size_t capacity;$/;"	m	struct:big_int::big_obj	file:
+capacity	big_integer.cpp	/^        size_t capacity;$/;"	m	struct:big_int::big_obj	file:
+capacity	bigint.cpp	/^        size_t capacity;$/;"	m	struct:big_int::big_obj	file:
+check_resize_bb	big__integer.cpp	/^    static inline bool check_resize_bb(big_int const & a, big_int const & b)$/;"	f	class:big_int
+check_resize_bb	big_integer.cpp	/^    static inline bool check_resize_bb(big_int const & a, big_int const & b)$/;"	f	class:big_int
+check_resize_bb	bigint.cpp	/^    static inline bool check_resize_bb(big_int const & a, big_int const & b)$/;"	f	class:big_int	file:
+check_resize_sb	big__integer.cpp	/^    static inline bool check_resize_sb(big_int const & a, big_int const & b) $/;"	f	class:big_int
+check_resize_sb	big_integer.cpp	/^    static inline bool check_resize_sb(big_int const & a, big_int const & b) $/;"	f	class:big_int
+check_resize_sb	bigint.cpp	/^    static inline bool check_resize_sb(big_int const & a, big_int const & b) $/;"	f	class:big_int	file:
+check_resize_ss	big__integer.cpp	/^    static inline bool check_resize_ss(big_int const & a, big_int const & b)$/;"	f	class:big_int
+check_resize_ss	big_integer.cpp	/^    static inline bool check_resize_ss(big_int const & a, big_int const & b)$/;"	f	class:big_int
+check_resize_ss	bigint.cpp	/^    static inline bool check_resize_ss(big_int const & a, big_int const & b)$/;"	f	class:big_int	file:
+data	big__integer.cpp	/^        uint32_t * data;$/;"	m	struct:big_int::big_obj	file:
+data	big__integer.cpp	/^    soo data;$/;"	m	class:big_int	file:
+data	big_integer.cpp	/^        uint32_t * data;$/;"	m	struct:big_int::big_obj	file:
+data	big_integer.cpp	/^    soo data;$/;"	m	class:big_int	file:
+data	bigint.cpp	/^        uint32_t * data;$/;"	m	struct:big_int::big_obj	file:
+data	bigint.cpp	/^    soo data;$/;"	m	class:big_int	file:
+div_bb	big__integer.cpp	/^    static inline big_int div_bb(big_int const & a, big_int const & b)$/;"	f	class:big_int
+left	big__integer.cpp	/^        uint32_t rigth, left;$/;"	m	struct:big_int::small_obj	file:
+left	big_integer.cpp	/^        uint32_t rigth, left;$/;"	m	struct:big_int::small_obj	file:
+left	bigint.cpp	/^        uint32_t rigth, left;$/;"	m	struct:big_int::small_obj	file:
+main	big__integer.cpp	/^int main()$/;"	f
+main	big_integer.cpp	/^int main()$/;"	f
+mul	big__integer.cpp	/^    static inline std::pair<uint32_t, uint32_t> const mul(uint32_t const & a, uint32_t const & b, uint32_t cf_ = 0, uint32_t cf__ = 0)   \/\/ a * b + cf_$/;"	f	class:big_int::std
+mul	big_integer.cpp	/^    static inline std::pair<uint32_t, uint32_t> const mul(uint32_t const & a, uint32_t const & b, uint32_t cf_ = 0, uint32_t cf__ = 0)   \/\/ a * b + cf_$/;"	f	class:big_int::std
+mul	bigint.cpp	/^    static inline std::pair<uint32_t, uint32_t> const mul(uint32_t const & a, uint32_t const & b, uint32_t cf_ = 0)   \/\/ a * b + cf_$/;"	f	class:big_int::std	file:
+mul_bb	big__integer.cpp	/^    static inline big_int mul_bb(big_int const & a, big_int const & b)$/;"	f	class:big_int
+mul_bb	big_integer.cpp	/^    static inline big_int mul_bb(big_int const & a, big_int const & b)$/;"	f	class:big_int
+mul_bb	bigint.cpp	/^    static inline big_int mul_bb(big_int const & a, big_int const & b)$/;"	f	class:big_int	file:
+mul_bs	big__integer.cpp	/^    static inline big_int mul_bs(big_int const & a, big_int const & b) \/\/a BIG b SMALL$/;"	f	class:big_int
+mul_bs	big_integer.cpp	/^    static inline big_int mul_bs(big_int const & a, big_int const & b) \/\/a BIG b SMALL$/;"	f	class:big_int
+mul_bs	bigint.cpp	/^    static inline big_int mul_bs(big_int const & a, big_int const & b) \/\/a BIG b SMALL$/;"	f	class:big_int	file:
+mul_bss	big__integer.cpp	/^    static inline big_int mul_bss(big_int const & a, uint32_t const & b)$/;"	f	class:big_int
+mul_sb	big__integer.cpp	/^    static inline big_int mul_sb(big_int const & a, big_int const & b) \/\/a SMALL b BIG$/;"	f	class:big_int
+mul_sb	big_integer.cpp	/^    static inline big_int mul_sb(big_int const & a, big_int const & b) \/\/a SMALL b BIG$/;"	f	class:big_int
+mul_sb	bigint.cpp	/^    static inline big_int mul_sb(big_int const & a, big_int const & b) \/\/a SMALL b BIG$/;"	f	class:big_int	file:
+mul_ss	big__integer.cpp	/^    static inline big_int mul_ss(big_int const & a, big_int const & b)$/;"	f	class:big_int
+mul_ss	big_integer.cpp	/^    static inline big_int mul_ss(big_int const & a, big_int const & b)$/;"	f	class:big_int
+mul_ss	bigint.cpp	/^    static inline big_int mul_ss(big_int const & a, big_int const & b)$/;"	f	class:big_int	file:
+operator <<	big__integer.cpp	/^std::ostream & operator << (std::ostream & s, big_int const & a)$/;"	f
+operator <<	big_integer.cpp	/^std::ostream & operator << (std::ostream & s, big_int const & a)$/;"	f
+operator =	big__integer.cpp	/^    big_int & operator = (big_int a)$/;"	f	class:big_int
+operator =	big_integer.cpp	/^    big_int & operator = (big_int a)$/;"	f	class:big_int
+rigth	big__integer.cpp	/^        uint32_t rigth, left;$/;"	m	struct:big_int::small_obj	file:
+rigth	big_integer.cpp	/^        uint32_t rigth, left;$/;"	m	struct:big_int::small_obj	file:
+rigth	bigint.cpp	/^        uint32_t rigth, left;$/;"	m	struct:big_int::small_obj	file:
+set_zero	big__integer.cpp	/^    static inline void set_zero(big_int & a) \/\/a BIG$/;"	f	class:big_int
+set_zero	big_integer.cpp	/^    static inline void set_zero(big_int & a) \/\/a BIG$/;"	f	class:big_int
+set_zero	bigint.cpp	/^    static inline void set_zero(big_int & a) \/\/a BIG$/;"	f	class:big_int	file:
+size	big__integer.cpp	/^    size_t size;$/;"	m	class:big_int	file:
+size	big_integer.cpp	/^    size_t size;$/;"	m	class:big_int	file:
+size	bigint.cpp	/^    size_t size;$/;"	m	class:big_int	file:
+small	big__integer.cpp	/^        small_obj small;$/;"	m	union:big_int::soo	file:
+small	big_integer.cpp	/^        small_obj small;$/;"	m	union:big_int::soo	file:
+small	bigint.cpp	/^        small_obj small;$/;"	m	union:big_int::soo	file:
+small_obj	big__integer.cpp	/^        small_obj():$/;"	f	struct:big_int::small_obj
+small_obj	big__integer.cpp	/^        small_obj(int32_t a):$/;"	f	struct:big_int::small_obj
+small_obj	big__integer.cpp	/^        small_obj(std::pair<int32_t, uint32_t> a):$/;"	f	struct:big_int::small_obj
+small_obj	big__integer.cpp	/^    struct small_obj$/;"	s	class:big_int	file:
+small_obj	big_integer.cpp	/^        small_obj():$/;"	f	struct:big_int::small_obj
+small_obj	big_integer.cpp	/^        small_obj(int32_t a):$/;"	f	struct:big_int::small_obj
+small_obj	big_integer.cpp	/^        small_obj(std::pair<int32_t, uint32_t> a):$/;"	f	struct:big_int::small_obj
+small_obj	big_integer.cpp	/^    struct small_obj$/;"	s	class:big_int	file:
+small_obj	bigint.cpp	/^        small_obj():$/;"	f	struct:big_int::small_obj
+small_obj	bigint.cpp	/^        small_obj(int32_t a):$/;"	f	struct:big_int::small_obj
+small_obj	bigint.cpp	/^        small_obj(std::pair<int32_t, uint32_t> a):$/;"	f	struct:big_int::small_obj
+small_obj	bigint.cpp	/^    struct small_obj$/;"	s	class:big_int	file:
+soo	big__integer.cpp	/^        soo()$/;"	f	union:big_int::soo
+soo	big__integer.cpp	/^        soo(int32_t a):$/;"	f	union:big_int::soo
+soo	big__integer.cpp	/^        soo(std::pair<int32_t, uint32_t> a):$/;"	f	union:big_int::soo
+soo	big__integer.cpp	/^    union soo$/;"	u	class:big_int	file:
+soo	big_integer.cpp	/^        soo()$/;"	f	union:big_int::soo
+soo	big_integer.cpp	/^        soo(int32_t a):$/;"	f	union:big_int::soo
+soo	big_integer.cpp	/^        soo(std::pair<int32_t, uint32_t> a):$/;"	f	union:big_int::soo
+soo	big_integer.cpp	/^    union soo$/;"	u	class:big_int	file:
+soo	bigint.cpp	/^        soo()$/;"	f	union:big_int::soo
+soo	bigint.cpp	/^        soo(int32_t a):$/;"	f	union:big_int::soo
+soo	bigint.cpp	/^        soo(std::pair<int32_t, uint32_t> a):$/;"	f	union:big_int::soo
+soo	bigint.cpp	/^    union soo$/;"	u	class:big_int	file:
+swap	big__integer.cpp	/^    void swap (big_int & a)$/;"	f	class:big_int
+swap	big_integer.cpp	/^    void swap (big_int & a)$/;"	f	class:big_int
+~big_int	big__integer.cpp	/^    ~big_int()$/;"	f	class:big_int
+~big_int	big_integer.cpp	/^    ~big_int()$/;"	f	class:big_int
+~big_int	bigint.cpp	/^    ~big_int()$/;"	f	class:big_int	file:
+~soo	big__integer.cpp	/^        ~soo()$/;"	f	union:big_int::soo
+~soo	big_integer.cpp	/^        ~soo()$/;"	f	union:big_int::soo
+~soo	bigint.cpp	/^        ~soo()$/;"	f	union:big_int::soo
