@@ -12,9 +12,10 @@ struct G
     {}
 
     template <typename ... Bs>
-    A operator () (Bs && ...)
+    A & operator () (Bs && ...)
     {
-        return static_cast <A &&> (a);
+        //return static_cast <decltype(a) &&> (a);  //TODO call_once_bind
+        return static_cast <A &> (a); //TODO bind
     }
 private:
     typename std::remove_reference <A> :: type a;
@@ -122,8 +123,8 @@ struct G <placeholder <N> const &>
 template <typename F, typename ... Arg> 
 struct G <bind_t <F, Arg ...> >
 {
-    G(bind_t <F, Arg ...> && _a) : 
-        a(move(_a)) 
+    G(bind_t <F, Arg ...> _a) : 
+        a(_a) 
     {}
 
     template <typename ... Bs>
@@ -152,10 +153,26 @@ private:
 };
 
 template <typename F, typename ... Arg>
+struct G <bind_t <F, Arg ...> &>
+{
+    G(bind_t <F, Arg ...> & _a) : 
+        a(_a) 
+    {}
+
+    template <typename ... Bs>
+    decltype(auto) operator () (Bs && ... bs)
+    {
+        return a(std::forward <Bs> (bs) ...);
+    }
+private:
+    bind_t <F, Arg ...> a;
+};
+
+template <typename F, typename ... Arg>
 struct G <bind_t <F, Arg ...> const &>
 {
-    G(bind_t <F, Arg ...> && _a) : 
-        a(move(_a)) 
+    G(bind_t <F, Arg ...> const & _a) : 
+        a(_a) 
     {}
 
     template <typename ... Bs>
@@ -170,8 +187,8 @@ private:
 template <typename F, typename ... As>
 struct bind_t
 {
-    bind_t(F f, As && ... as) : 
-        f(f), 
+    bind_t(F _f, As && ... as) : 
+        f(_f), 
         gs(std::forward <As> (as) ...)
     {}
 
@@ -188,34 +205,30 @@ private:
               int ... index, 
               int ... PH_index, 
               typename ... Bs>
-    decltype(auto) call(integer_sequence <ks ...> a, 
-                        integer_sequence <index ...> b, 
-                        integer_sequence <PH_index ...> placeholder_list,  
+    decltype(auto) call(integer_sequence <ks ...> as_index, 
+                        integer_sequence <index ...> bs_index, 
+                        integer_sequence <PH_index ...> placeholder_list,
                         Bs && ... bs)
     {
-        return f(std::get <ks> (gs) 
-                    (get_arg  
-                        <index, 
-                        typename get_type 
-                            <Bs, 
-                            need_forward <index + 1, decltype(placeholder_list)> :: value
-                            > :: value ... //Bs, index
-                        >
-                        (std::forward <Bs> (bs) ...) ... //Bs, bs, index
-                    ) ... //ks
-                );
-    }
-
-    template <int index, typename ... Ts>
-    decltype(auto) get_arg(Ts ... from) {
-        return static_cast <typename std::tuple_element
-                                <index, std::tuple <Ts ...> > :: type 
-                           > 
-                           (std::get <index> 
-                                (std::tuple <Ts ...> 
-                                    (std::forward <Ts> (from) ...)
-                                )
-                           );
+        return f
+        (
+            std::get <ks> (gs) 
+            (
+                 static_cast 
+                 <
+                    typename get_type 
+                    <
+                        Bs, 
+                        need_forward 
+                        <
+                            index + 1, 
+                            integer_sequence <PH_index ...> 
+                        > :: value
+                    > :: value
+                >
+                (bs)...
+            )...
+        );
     }
 
     F f;

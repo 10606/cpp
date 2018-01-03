@@ -130,7 +130,7 @@ struct need_forward
 template <typename T, bool f>
 struct get_type
 {
-    typedef T value;
+    typedef T & value;
 };
 
 template <typename T>
@@ -143,6 +143,24 @@ template <typename T>
 struct array_killer
 {
     typedef T value;
+};
+
+template <typename T, int N>
+struct array_killer <T(&)[N]>
+{
+    typedef T * value;
+};
+
+template <typename T, int N>
+struct array_killer <T[N]>
+{
+    typedef T * value;
+};
+
+template <typename T, int N>
+struct array_killer <const T[N]>
+{
+    typedef const T * value;
 };
 
 template <typename T, int N>
