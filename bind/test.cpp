@@ -2,7 +2,7 @@
 #include <string>
 #include "bindf.h"
 
-void f(std::string a, std::string b, std::string c, std::string d, std::string const & e) {
+void f(std::string a, std::string b, std::string c, std::string d, std::string && e) {
     std::cout << a << " " << b << " " << c << " " << d << " " << e << "\n";
     d = "D";
     a = "A";
@@ -97,6 +97,7 @@ int main()
     lg();  //s
     lg();  //S
     
+    //auto w = bind(&f, "1", placeholder<2>(), bind(&concat, std::string("3 "), _1), _3, s);
     auto w = call_once_bind(&f, "1", placeholder<2>(), bind(&concat, std::string("3 "), _1), _3, s);
     w(std::move(a), std::move(b), s);
     

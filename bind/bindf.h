@@ -4,7 +4,7 @@
 #ifndef BINDF_H
 #define BINDF_H
 
-template <typename A>
+template <bool calls, typename A>
 struct G
 {
     G(A && _a) : 
@@ -12,17 +12,18 @@ struct G
     {}
 
     template <typename ... Bs>
-    A & operator () (Bs && ...)
+    typename ret_type <calls, A> :: value operator () (Bs && ...)
     {
         //return static_cast <decltype(a) &&> (a);  //TODO call_once_bind
-        return static_cast <A &> (a); //TODO bind
+        //return static_cast <A &> (a); //TODO bind
+        return static_cast <typename ret_type <calls, A> :: value> (a);
     }
 private:
     typename std::remove_reference <A> :: type a;
 };
 
-template <>
-struct G <placeholder <1> &&>
+template <bool calls>
+struct G <calls, placeholder <1> &&>
 {
     G(placeholder <1> &&) 
     {}
@@ -37,8 +38,8 @@ struct G <placeholder <1> &&>
     }
 };
 
-template <>
-struct G <placeholder <1> >
+template <bool calls>
+struct G <calls, placeholder <1> >
 {
     G(placeholder <1> &&) 
     {}
@@ -53,8 +54,8 @@ struct G <placeholder <1> >
     }
 };
 
-template <>
-struct G <placeholder <1> const &>
+template <bool calls>
+struct G <calls, placeholder <1> const &>
 {
     G(placeholder <1> &&) 
     {}
@@ -69,8 +70,8 @@ struct G <placeholder <1> const &>
     }
 };
 
-template <int N>
-struct G <placeholder <N> &&>
+template <bool calls, int N>
+struct G <calls, placeholder <N> &&>
 {
     G(placeholder <N> &&)
     {}
@@ -81,13 +82,13 @@ struct G <placeholder <N> &&>
     template <typename B, typename ... Bs>
     decltype(auto) operator () (B && b, Bs && ... bs)
     {
-        G <placeholder <N - 1> > next ( (placeholder <N - 1> ()) );
+        G <calls, placeholder <N - 1> > next ( (placeholder <N - 1> ()) );
         return next(std::forward <Bs> (bs) ...);
     }
 };
 
-template <int N>
-struct G <placeholder <N> >
+template <bool calls, int N>
+struct G <calls, placeholder <N> >
 {
     G(placeholder <N> &&)
     {}
@@ -98,13 +99,13 @@ struct G <placeholder <N> >
     template <typename B, typename ... Bs>
     decltype(auto) operator () (B && b, Bs && ... bs)
     {
-        G <placeholder <N - 1> > next ( (placeholder <N - 1> ()) );
+        G <calls, placeholder <N - 1> > next ( (placeholder <N - 1> ()) );
         return next(std::forward <Bs> (bs) ...);
     }
 };
 
-template <int N>
-struct G <placeholder <N> const &>
+template <bool calls, int N>
+struct G <calls, placeholder <N> const &>
 {
     G(placeholder <N> &&)
     {}
@@ -115,15 +116,15 @@ struct G <placeholder <N> const &>
     template <typename B, typename ... Bs>
     decltype(auto) operator () (B && b, Bs && ... bs)
     {
-        G <placeholder <N - 1> > next ( (placeholder <N - 1> ()) );
+        G <calls, placeholder <N - 1> > next ( (placeholder <N - 1> ()) );
         return next(std::forward <Bs> (bs) ...);
     }
 };
 
-template <typename F, typename ... Arg> 
-struct G <bind_t <F, Arg ...> >
+template <bool calls, bool calls_, typename F, typename ... Arg> 
+struct G <calls, bind_t <calls_, F, Arg ...> >
 {
-    G(bind_t <F, Arg ...> _a) : 
+    G(bind_t <calls_, F, Arg ...> _a) : 
         a(_a) 
     {}
 
@@ -133,13 +134,13 @@ struct G <bind_t <F, Arg ...> >
         return a(std::forward <Bs> (bs) ...);
     }
 private:
-    bind_t <F, Arg ...> a;
+    bind_t <calls_, F, Arg ...> a;
 };
 
-template <typename F, typename ... Arg>
-struct G <bind_t <F, Arg ...> &&>
+template <bool calls, bool calls_, typename F, typename ... Arg>
+struct G <calls, bind_t <calls_, F, Arg ...> &&>
 {
-    G(bind_t <F, Arg ...> && _a) : 
+    G(bind_t <calls_, F, Arg ...> && _a) : 
         a(move(_a)) 
     {}
 
@@ -149,13 +150,13 @@ struct G <bind_t <F, Arg ...> &&>
         return a(std::forward <Bs> (bs) ...);
     }
 private:
-    bind_t <F, Arg ...> a;
+    bind_t <calls_, F, Arg ...> a;
 };
 
-template <typename F, typename ... Arg>
-struct G <bind_t <F, Arg ...> &>
+template <bool calls, bool calls_, typename F, typename ... Arg>
+struct G <calls, bind_t <calls_, F, Arg ...> &>
 {
-    G(bind_t <F, Arg ...> & _a) : 
+    G(bind_t <calls_, F, Arg ...> & _a) : 
         a(_a) 
     {}
 
@@ -165,13 +166,13 @@ struct G <bind_t <F, Arg ...> &>
         return a(std::forward <Bs> (bs) ...);
     }
 private:
-    bind_t <F, Arg ...> a;
+    bind_t <calls_, F, Arg ...> a;
 };
 
-template <typename F, typename ... Arg>
-struct G <bind_t <F, Arg ...> const &>
+template <bool calls, bool calls_, typename F, typename ... Arg>
+struct G <calls, bind_t <calls_, F, Arg ...> const &>
 {
-    G(bind_t <F, Arg ...> const & _a) : 
+    G(bind_t <calls_, F, Arg ...> const & _a) : 
         a(_a) 
     {}
 
@@ -181,10 +182,10 @@ struct G <bind_t <F, Arg ...> const &>
         return a(std::forward <Bs> (bs) ...);
     }
 private:
-    bind_t <F, Arg ...> a;
+    bind_t <calls_, F, Arg ...> a;
 };
 
-template <typename F, typename ... As>
+template <bool calls, typename F, typename ... As>
 struct bind_t
 {
     bind_t(F _f, As && ... as) : 
@@ -232,20 +233,20 @@ private:
     }
 
     F f;
-    std::tuple <G <As> ...> gs;
+    std::tuple <G <calls, As> ...> gs;
 };
 
 template <typename F, typename ... As>
 decltype(auto) bind(F f, As && ... as)
 {
-    return bind_t <F, typename array_killer <As> :: value ...> 
+    return bind_t <1, F, typename array_killer <As> :: value ...> 
                   (f, (std::forward <As> (as) )...);
 }
 
 template <typename F, typename ... As>
 decltype(auto) call_once_bind(F f, As && ... as) 
 {
-    return bind_t <F, typename array_killer <As> :: value && ...> 
+    return bind_t <0, F, typename array_killer <As> :: value && ...> 
                   (f, (std::forward <As> (as) )...);
 }
 

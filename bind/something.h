@@ -17,7 +17,7 @@ constexpr placeholder <3> _3;
 constexpr placeholder <4> _4;
 constexpr placeholder <5> _5;
 
-template <typename F, typename ... As>
+template <bool calls, typename F, typename ... As>
 struct bind_t;
 
 template <typename seq, int arg>
@@ -76,20 +76,20 @@ struct make_IS_from_type <placeholder <N> const &>
     typedef integer_sequence <N> value;
 };
 
-template <typename F, typename ... As> 
-struct make_IS_from_type <bind_t <F, As ...> >
+template <bool calls, typename F, typename ... As> 
+struct make_IS_from_type <bind_t <calls, F, As ...> >
 {
     typedef typename make_IS_from_list <As ...> :: value value;
 };
 
-template <typename F, typename ... As>
-struct make_IS_from_type <bind_t <F, As ...> &&>
+template <bool calls, typename F, typename ... As>
+struct make_IS_from_type <bind_t <calls, F, As ...> &&>
 {
     typedef typename make_IS_from_list <As ...> :: value value;
 };
 
-template <typename F, typename ... As>
-struct make_IS_from_type <bind_t <F, As ...> const &>
+template <bool calls, typename F, typename ... As>
+struct make_IS_from_type <bind_t <calls, F, As ...> const &>
 {
     typedef typename make_IS_from_list <As ...> :: value value;
 };
@@ -167,6 +167,18 @@ template <typename T, int N>
 struct array_killer <const T(&)[N]>
 {
     typedef const T * value;
+};
+
+template <bool f, typename A>
+struct ret_type
+{
+    typedef A & value;
+};
+
+template <typename A>
+struct ret_type <0, A>
+{
+    typedef typename std::remove_reference <A> :: type && value;
 };
 
 #endif
