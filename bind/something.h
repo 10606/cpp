@@ -140,33 +140,15 @@ struct get_type<T, 1>
 };
 
 template <typename T>
-struct array_killer
+struct remove_array
 {
     typedef T value;
 };
 
 template <typename T, int N>
-struct array_killer <T(&)[N]>
+struct remove_array <T (&) [N]>
 {
     typedef T * value;
-};
-
-template <typename T, int N>
-struct array_killer <T[N]>
-{
-    typedef T * value;
-};
-
-template <typename T, int N>
-struct array_killer <const T[N]>
-{
-    typedef const T * value;
-};
-
-template <typename T, int N>
-struct array_killer <const T(&)[N]>
-{
-    typedef const T * value;
 };
 
 template <bool f, typename A>
@@ -179,6 +161,18 @@ template <typename A>
 struct ret_type <0, A>
 {
     typedef typename std::remove_reference <A> :: type && value;
+};
+
+template <typename F>
+struct get_func_type 
+{
+    typedef std::remove_reference_t <F> value;
+};
+
+template <typename T, typename ... Args>
+struct get_func_type <T (&) (Args ...)> 
+{
+    typedef T (* value) (Args ...);
 };
 
 #endif

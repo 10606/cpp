@@ -124,8 +124,8 @@ struct G <calls, placeholder <N> const &>
 template <bool calls, bool calls_, typename F, typename ... Arg> 
 struct G <calls, bind_t <calls_, F, Arg ...> >
 {
-    G(bind_t <calls_, F, Arg ...> _a) : 
-        a(_a) 
+    G(bind_t <calls_, F, Arg ...> && _a) : 
+        a(std::move(_a)) 
     {}
 
     template <typename ... Bs>
@@ -141,7 +141,7 @@ template <bool calls, bool calls_, typename F, typename ... Arg>
 struct G <calls, bind_t <calls_, F, Arg ...> &&>
 {
     G(bind_t <calls_, F, Arg ...> && _a) : 
-        a(move(_a)) 
+        a(std::move(_a)) 
     {}
 
     template <typename ... Bs>
@@ -188,8 +188,8 @@ private:
 template <bool calls, typename F, typename ... As>
 struct bind_t
 {
-    bind_t(F _f, As && ... as) : 
-        f(_f), 
+    bind_t(F && _f, As && ... as) : 
+        f(std::forward <F> (_f)), 
         gs(std::forward <As> (as) ...)
     {}
 
@@ -232,22 +232,22 @@ private:
         );
     }
 
-    F f;
+    typename get_func_type <F> :: value f;
     std::tuple <G <calls, As> ...> gs;
 };
 
 template <typename F, typename ... As>
-decltype(auto) bind(F f, As && ... as)
+decltype(auto) bind(F && f, As && ... as)
 {
-    return bind_t <1, F, typename array_killer <As> :: value ...> 
-                  (f, (std::forward <As> (as) )...);
+    return bind_t <1, F, typename remove_array <As> :: value ...> 
+                  (std::forward <F> (f), (std::forward <As> (as) )...);
 }
 
 template <typename F, typename ... As>
-decltype(auto) call_once_bind(F f, As && ... as) 
+decltype(auto) call_once_bind(F && f, As && ... as) 
 {
-    return bind_t <0, F, typename array_killer <As> :: value && ...> 
-                  (f, (std::forward <As> (as) )...);
+    return bind_t <0, F, typename remove_array <As> :: value && ...> 
+                  (std::forward <F> (f), (std::forward <As> (as) )...);
 }
 
 #endif
