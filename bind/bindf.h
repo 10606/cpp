@@ -246,7 +246,7 @@ decltype(auto) bind(F && f, As && ... as)
 template <typename F, typename ... As>
 decltype(auto) call_once_bind(F && f, As && ... as) 
 {
-    return bind_t <0, F, typename remove_array <As> :: value && ...> 
+    return bind_t <0, F, typename remove_array <As> :: value ...> 
                   (std::forward <F> (f), (std::forward <As> (as) )...);
 }
 
