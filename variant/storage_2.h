@@ -41,7 +41,8 @@ struct destruct_storage : storage <f, T0, Ts ...>
     {}
     ~destruct_storage()
     {
-        this->destroy(ind);
+        if (ind != variant_npos)
+           this->destroy(ind);
     }
 };
 

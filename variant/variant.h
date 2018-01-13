@@ -17,6 +17,7 @@
 
 template <typename T0, typename ... Ts>
 struct variant {
+    template <typename = std::enable_if_t <std::is_default_constructible <T0> :: value>>
     constexpr variant () :
         stor(),
         ind(0)
@@ -356,5 +357,135 @@ constexpr decltype(auto) get_if(variant<Types...> const* pv) noexcept
 	return ((!pv || (pv->index() != index_of <T, Types ...> :: value)) ? nullptr : &get<T>(*pv));
 }
 
+
+
+
+template <typename T, size_t ... index>
+struct func_stor
+{
+	constexpr const T & get_func() const
+	{
+		return data;
+	}
+	T data;
+};
+
+template <typename T, size_t index0, size_t ... indexes>
+struct func_stor <T, index0, indexes ...>
+{
+	template <typename ... size_ts>
+	constexpr const T & get_func (size_t first_ind, size_ts ... other_inds) const
+	{
+		return data_arr[first_ind].get_func(other_inds ...);
+	}
+
+	func_stor <T, indexes ...> data_arr[index0];
+};
+
+template <typename ... Ts>
+struct list_variants;
+
+template <typename func_stor_type, typename variants, typename index_seq>
+struct make_func_stor;
+
+template 
+<
+    typename ret, 
+    typename vis, 
+    typename ... vars, 
+    size_t index0, 
+    size_t ... indexes, 
+    size_t ... inds
+>
+struct make_func_stor 
+        <
+            func_stor <ret (*) (vis, vars ...), index0, indexes ...>, 
+            list_variants <vars ...>, 
+            std::index_sequence <inds ...>
+        >
+{
+	using func_stor_type = func_stor <ret (*) (vis, vars ...), index0, indexes ...>;
+	static constexpr func_stor_type build()
+	{
+		return build_array
+        (
+            std::make_index_sequence
+            <
+                variant_size
+                <
+                    typename get_type
+                    <
+                        sizeof ... (inds), 
+                        typename std::remove_reference <vars> :: type ...
+                    > :: type
+                > :: value
+            >()
+        );
+	}
+	template <size_t ... var_inds>
+	static constexpr func_stor_type build_array(std::index_sequence <var_inds ...>)
+	{
+		return func_stor_type 
+        {
+            make_func_stor 
+            <
+                func_stor <ret (*) (vis, vars ...), indexes ...>, 
+                list_variants <vars ...>, 
+                std::index_sequence <inds ..., var_inds> 
+            > :: build() ... 
+        };
+	}
+};
+
+template 
+<
+    typename ret, 
+    typename vis, 
+    typename ... vars, 
+    size_t ... inds
+>
+struct make_func_stor 
+<
+    func_stor <ret (*) (vis, vars ...)>, 
+    list_variants <vars ...>, 
+    std::index_sequence <inds ...>
+>
+{
+	static constexpr decltype(auto) exec(vis visitor, vars ... variants)
+	{
+		return std::forward <vis> (visitor) (get <inds> (std::forward <vars> (variants)) ...);
+	}
+	static constexpr func_stor <ret (*) (vis, vars ...)> build()
+	{
+		return func_stor <ret (*) (vis, vars ...)> {& exec };
+	}
+};
+
+template <typename Visitor, typename ... Variants>
+constexpr decltype(auto) visit (Visitor && vis, Variants && ... vars)
+{
+	if ((vars.valueless_by_exception() || ...))
+	{
+		throw bad_variant_access();
+	}
+	constexpr auto exec = make_func_stor 
+                            <
+                                func_stor <
+                                    decltype
+                                    (
+                                        std::forward <Visitor> (vis) 
+                                        (get <0> (std::forward <Variants> (vars)) ...)
+                                    ) (*) (Visitor &&, Variants && ...),
+                                    variant_size <typename std::remove_reference <Variants> :: type> :: value ...
+                                >, 
+                                list_variants <Variants && ...>,
+                                std::index_sequence <>
+                            > :: build();
+	return exec.get_func(vars.index() ...) 
+            (
+                std::forward <Visitor> (vis), 
+                std::forward <Variants> (vars) ...
+            );
+}
 
 #endif
