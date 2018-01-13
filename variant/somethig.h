@@ -171,4 +171,24 @@ struct is_same
 {
     static const bool value = std::is_same <typename std::remove_reference <T0> :: type, typename std::remove_reference <T1> :: type> :: value; 
 };
+
+template <typename T, typename ... Ts>
+struct F_type : F_type <Ts ...>
+{
+    using F_type <Ts ...> :: f;
+    static T f (T);
+};
+
+template <typename T>
+struct F_type <T>
+{
+    static T f (T);
+};
+
+template <typename T, typename ... Ts>
+struct get_F_index
+{
+    static const size_t value = index_of <decltype(F_type <Ts ...> :: f(std::forward <T> (std::declval <T> () ))), Ts ...> :: value;
+};
+
 #endif

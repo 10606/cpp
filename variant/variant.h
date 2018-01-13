@@ -76,11 +76,11 @@ struct variant {
     }
     template <typename T>
     constexpr variant (T && t) :
-        stor(std::forward <T &&> (t)),
-        ind (static_cast <size_t> (index_of <T, T0, Ts ...> :: value))
+        stor(std::in_place_index_t <get_F_index <T, T0, Ts ...> :: value> (), std::forward <T &&> (t)),
+        ind (static_cast <size_t> (get_F_index <T, T0, Ts ...> :: value))
     {
         stor.ind = ind;
-        static_assert (index_of <T, T0, Ts ...> :: value != -1);
+        //static_assert (index_of <T, T0, Ts ...> :: value != -1);
     }
     constexpr void swap( variant& rhs )
     {
