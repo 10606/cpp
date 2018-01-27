@@ -810,10 +810,14 @@ private:
     friend typename container <T> :: iterator const & get_iter(any_iterator <T, category> const & a);
     template <typename T, typename category, template <typename> typename container> 
     friend typename container <T> :: iterator const & get_iter(any_iterator <const T, category> const & a);
-    template <typename T, typename category, typename typeIter> //TODO FIXME check kek mem
-    friend bool check (any_iterator<T, category> const & a);
-    template <typename T, typename category, typename typeIter> //TODO FIXME check kek mem
-    friend bool check (any_iterator<const T, category> const & a);
+    //template <typename T, typename category, typename typeIter> //TODO FIXME check kek mem
+    //friend bool check (any_iterator<T, category> const & a);
+    //template <typename T, typename category, typename typeIter> //TODO FIXME check kek mem
+    //friend bool check (any_iterator<const T, category> const & a);
+    template <typename T, typename category, template <typename> typename container> //TODO FIXME check kek mem
+    friend bool check (any_iterator<T, category> const & a) ;
+    template <typename T, typename category, template <typename> typename container> //TODO FIXME check kek mem
+    friend bool check (any_iterator<const T, category> const & a); 
 };
 
 
@@ -981,16 +985,17 @@ typename container <T> :: iterator const & get_iter(any_const_iterator <T, categ
     return any_iterator_impl::access <typename container <T> :: iterator> (a.stg);
 }
 
-template <typename T, typename category, typename typeIter> //TODO FIXME check kek mem
+template <typename T, typename category, template <typename> typename container> //TODO FIXME check kek mem
 bool check (any_iterator<T, category> const & a) 
 {
-    return (a.ops->copy == & inner_copy <typeIter>);
+    return (a.ops->copy == & inner_copy <typename container <T> :: iterator>);
 }
 
-template <typename T, typename category, typename typeIter> //TODO FIXME check kek mem
+template <typename T, typename category, template <typename> typename container> //TODO FIXME check kek mem
 bool check (any_const_iterator<T, category> const & a) 
 {
-    return (a.ops->copy == & inner_copy <typeIter>);
+    return ((a.ops->copy == & inner_copy <typename container <T> :: iterator>) || 
+            (a.ops->copy == & inner_copy <typename container <T> :: const_iterator>));
 }
 
 }

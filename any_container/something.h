@@ -57,7 +57,7 @@ template <typename T, typename category, template <typename> typename container,
  std::enable_if_t <!is_small <container <T> >, any_iterator <T, category> > erase(small_storage & storage, any_const_iterator <T, category> to)
 {
     //return to;
-    assert ((any_iterator_impl::check <T, category, typename container <T> :: iterator> (to)));
+    assert ((any_iterator_impl::check <T, category, container> (to)));
     return any_iterator <T, category> (
         (* reinterpret_cast <container <T> * &> (storage)) 
         .erase (any_iterator_impl::get_iter <T, category, container> (to))
@@ -68,7 +68,7 @@ template <typename T, typename category, template <typename> typename container,
  std::enable_if_t <!is_small <container <T> >, any_iterator <T, category> > insert_r(small_storage & storage, T && a, any_const_iterator <T, category> to)
 {
     //return to;
-    assert ((any_iterator_impl::check <T, category, typename container <T> :: iterator> (to)));
+    assert ((any_iterator_impl::check <T, category, container> (to)));
     return any_iterator <T, category> (
         (* reinterpret_cast <container <T> * &> (storage))
         .insert (any_iterator_impl::get_iter <T, category, container> (to), std::move(a))
@@ -79,7 +79,7 @@ template <typename T, typename category, template <typename> typename container,
  std::enable_if_t <((!is_small <container <T> >) && (std::is_copy_constructible_v <T>)), any_iterator <T, category> > insert(small_storage & storage, T const & a, any_const_iterator <T, category> to)
 {
     //return to;
-    assert ((any_iterator_impl::check <T, category, typename container <T> :: iterator> (to)));
+    assert ((any_iterator_impl::check <T, category, container> (to)));
     return any_iterator <T, category> (
         (* reinterpret_cast <container <T> * &> (storage))
         .insert (any_iterator_impl::get_iter <T, category, container> (to), a)
@@ -150,7 +150,7 @@ template <typename T, typename category, template <typename> typename container,
  std::enable_if_t <is_small <container <T> >, any_iterator <T, category> > erase  (small_storage & storage, any_const_iterator <T, category> to)
 {
     //return to;
-    assert ((any_iterator_impl::check <T, category, typename container <T> :: iterator> (to)));
+    assert ((any_iterator_impl::check <T, category, container> (to)));
     return any_iterator <T, category> (
         (reinterpret_cast <container <T> &> (storage))
         .erase (any_iterator_impl::get_iter <T, category, container> (to))
@@ -161,7 +161,7 @@ template <typename T, typename category, template <typename> typename container,
  std::enable_if_t <is_small <container <T> >, any_iterator <T, category> > insert_r  (small_storage & storage, T && a, any_const_iterator <T, category> to)
 {
     //return to;
-    assert ((any_iterator_impl::check <T, category, typename container <T> :: iterator> (to)));
+    assert ((any_iterator_impl::check <T, category, container> (to)));
     return any_iterator <T, category> (
         (reinterpret_cast <container <T> &> (storage))
         .insert (any_iterator_impl::get_iter <T, category, container> (to), std::move(a))
@@ -172,7 +172,7 @@ template <typename T, typename category, template <typename> typename container,
  std::enable_if_t <((is_small <container <T> >) && (std::is_copy_constructible_v <T>)), any_iterator <T, category> > insert  (small_storage & storage, T const & a,  any_const_iterator <T, category> to)
 {
     //return to;
-    assert ((any_iterator_impl::check <T, category, typename container <T> :: iterator> (to)));
+    assert ((any_iterator_impl::check <T, category, container> (to)));
     return any_iterator <T, category> (
         (reinterpret_cast <container <T> &> (storage))
         .insert (any_iterator_impl::get_iter <T, category, container> (to), a)
