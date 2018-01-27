@@ -26,16 +26,16 @@ typename container <T> :: iterator const & get_iter(any_iterator <T, category> c
 
 
 template <typename T, typename category, template <typename> typename container, bool f> 
-std::enable_if_t <!is_small <container <T> >,  const any_iterator <const T, category> > cend (small_storage const & storage)
+std::enable_if_t <!is_small <container <T> >, any_const_iterator <T, category> > cend (small_storage const & storage)
 {
-    const any_iterator <const T, category> ret((* reinterpret_cast <container <T> * const &> (storage)).cend());
+    any_const_iterator <T, category> ret((* reinterpret_cast <container <T> * const &> (storage)).cend());
     return ret;
 }
 
 template <typename T, typename category, template <typename> typename container, bool f > 
- std::enable_if_t <!is_small <container <T> >, const any_iterator <const T, category> > cbegin (small_storage const & storage)
+ std::enable_if_t <!is_small <container <T> >, any_const_iterator <T, category> > cbegin (small_storage const & storage)
 {
-    const any_iterator <const T, category> ret((* reinterpret_cast <container <T> * const &> (storage)).cbegin());
+    any_const_iterator <T, category> ret((* reinterpret_cast <container <T> * const &> (storage)).cbegin());
     return ret;
 }
 
@@ -54,7 +54,7 @@ template <typename T, typename category, template <typename> typename container,
 }
 
 template <typename T, typename category, template <typename> typename container, bool f > 
- std::enable_if_t <!is_small <container <T> >, any_iterator <T, category> > erase(small_storage & storage, any_iterator <T, category> to)
+ std::enable_if_t <!is_small <container <T> >, any_iterator <T, category> > erase(small_storage & storage, any_const_iterator <T, category> to)
 {
     //return to;
     assert ((any_iterator_impl::check <T, category, typename container <T> :: iterator> (to)));
@@ -65,7 +65,7 @@ template <typename T, typename category, template <typename> typename container,
 }
 
 template <typename T, typename category, template <typename> typename container, bool f > 
- std::enable_if_t <!is_small <container <T> >, any_iterator <T, category> > insert_r(small_storage & storage, T && a, any_iterator <T, category> to)
+ std::enable_if_t <!is_small <container <T> >, any_iterator <T, category> > insert_r(small_storage & storage, T && a, any_const_iterator <T, category> to)
 {
     //return to;
     assert ((any_iterator_impl::check <T, category, typename container <T> :: iterator> (to)));
@@ -76,7 +76,7 @@ template <typename T, typename category, template <typename> typename container,
 }
 
 template <typename T, typename category, template <typename> typename container, bool f > 
- std::enable_if_t <((!is_small <container <T> >) && (std::is_copy_constructible_v <T>)), any_iterator <T, category> > insert(small_storage & storage, T const & a, any_iterator <T, category> to)
+ std::enable_if_t <((!is_small <container <T> >) && (std::is_copy_constructible_v <T>)), any_iterator <T, category> > insert(small_storage & storage, T const & a, any_const_iterator <T, category> to)
 {
     //return to;
     assert ((any_iterator_impl::check <T, category, typename container <T> :: iterator> (to)));
@@ -123,15 +123,15 @@ template <typename T, typename category, template <typename> typename container,
 
 
 template <typename T, typename category, template <typename> typename container, bool f > 
- std::enable_if_t <is_small <container <T> >, const any_iterator <const T, category> > cend   (small_storage const & storage)
+ std::enable_if_t <is_small <container <T> >, any_const_iterator <T, category> > cend   (small_storage const & storage)
 {
-    return any_iterator <const T, category> ((reinterpret_cast <container <T> const &> (storage)).cend());
+    return any_const_iterator <T, category> ((reinterpret_cast <container <T> const &> (storage)).cend());
 }
 
 template <typename T, typename category, template <typename> typename container, bool f > 
- std::enable_if_t <is_small <container <T> >, const any_iterator <const T, category> > cbegin   (small_storage const & storage)
+ std::enable_if_t <is_small <container <T> >, any_const_iterator <T, category> > cbegin   (small_storage const & storage)
 {
-    return any_iterator <const T, category> ((reinterpret_cast <container <T> const &> (storage)).cbegin());
+    return any_const_iterator <T, category> ((reinterpret_cast <container <T> const &> (storage)).cbegin());
 }
 
 template <typename T, typename category, template <typename> typename container, bool f > 
@@ -147,7 +147,7 @@ template <typename T, typename category, template <typename> typename container,
 }
 
 template <typename T, typename category, template <typename> typename container, bool f > 
- std::enable_if_t <is_small <container <T> >, any_iterator <T, category> > erase  (small_storage & storage, any_iterator <T, category> to)
+ std::enable_if_t <is_small <container <T> >, any_iterator <T, category> > erase  (small_storage & storage, any_const_iterator <T, category> to)
 {
     //return to;
     assert ((any_iterator_impl::check <T, category, typename container <T> :: iterator> (to)));
@@ -158,7 +158,7 @@ template <typename T, typename category, template <typename> typename container,
 }
 
 template <typename T, typename category, template <typename> typename container, bool f > 
- std::enable_if_t <is_small <container <T> >, any_iterator <T, category> > insert_r  (small_storage & storage, T && a, any_iterator <T, category> to)
+ std::enable_if_t <is_small <container <T> >, any_iterator <T, category> > insert_r  (small_storage & storage, T && a, any_const_iterator <T, category> to)
 {
     //return to;
     assert ((any_iterator_impl::check <T, category, typename container <T> :: iterator> (to)));
@@ -169,7 +169,7 @@ template <typename T, typename category, template <typename> typename container,
 }
 
 template <typename T, typename category, template <typename> typename container, bool f > 
- std::enable_if_t <((is_small <container <T> >) && (std::is_copy_constructible_v <T>)), any_iterator <T, category> > insert  (small_storage & storage, T const & a, any_iterator <T, category> to)
+ std::enable_if_t <((is_small <container <T> >) && (std::is_copy_constructible_v <T>)), any_iterator <T, category> > insert  (small_storage & storage, T const & a,  any_const_iterator <T, category> to)
 {
     //return to;
     assert ((any_iterator_impl::check <T, category, typename container <T> :: iterator> (to)));
@@ -215,7 +215,7 @@ template <typename T, typename category, template <typename> typename container,
 
 
 template <typename T, typename category, template <typename> typename container, bool f > 
- std::enable_if_t <(!std::is_copy_constructible_v <T>), any_iterator <T, category> > insert(small_storage & storage, T const & a, any_iterator <T, category> to)
+ std::enable_if_t <(!std::is_copy_constructible_v <T>), any_iterator <T, category> > insert(small_storage & storage, T const & a, any_const_iterator <T, category> to)
 {
     throw;
 }

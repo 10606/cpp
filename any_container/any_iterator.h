@@ -51,6 +51,7 @@ struct any_iterator_ops<ValueType, std::forward_iterator_tag>
     using destroy_t = void (*)(small_storage_type& obj);
 
     using deref_t = ValueType& (*)(small_storage_type const& obj);
+    using deref_c_t = const ValueType& (*)(small_storage_type const& obj);
     using preinc_t = void (*)(small_storage_type& obj);
     using postinc_t = void (*)(small_storage_type& dst, small_storage_type& src);
 
@@ -62,6 +63,7 @@ struct any_iterator_ops<ValueType, std::forward_iterator_tag>
     destroy_t destroy;
 
     deref_t deref;
+    deref_c_t deref_c;
     preinc_t preinc;
     postinc_t postinc;
 
@@ -69,13 +71,14 @@ struct any_iterator_ops<ValueType, std::forward_iterator_tag>
 
     constexpr any_iterator_ops(copy_t copy, move_t move, assign_t assign,
                                destroy_t destroy,
-                               deref_t deref, preinc_t preinc, postinc_t postinc,
+                               deref_t deref, deref_c_t deref_c, preinc_t preinc, postinc_t postinc,
                                eq_t eq)
         : copy(copy)
         , move(move)
         , assign(assign)
         , destroy(destroy)
         , deref(deref)
+        , deref_c(deref_c)
         , preinc(preinc)
         , postinc(postinc)
         , eq(eq)
@@ -91,6 +94,7 @@ struct any_iterator_ops<ValueType, std::bidirectional_iterator_tag> : any_iterat
     using typename base::assign_t;
     using typename base::destroy_t;
     using typename base::deref_t;
+    using typename base::deref_c_t;
     using typename base::preinc_t;
     using typename base::postinc_t;
     using typename base::eq_t;
@@ -103,11 +107,11 @@ struct any_iterator_ops<ValueType, std::bidirectional_iterator_tag> : any_iterat
 
     constexpr any_iterator_ops(copy_t copy, move_t move, assign_t assign,
                                destroy_t destroy,
-                               deref_t deref, preinc_t preinc, postinc_t postinc,
+                               deref_t deref, deref_c_t deref_c, preinc_t preinc, postinc_t postinc,
                                eq_t eq, predec_t predec, postdec_t postdec)
         : any_iterator_ops<ValueType, std::forward_iterator_tag>(copy, move, assign,
                                                                  destroy,
-                                                                 deref, preinc, postinc, eq)
+                                                                 deref, deref_c, preinc, postinc, eq)
         , predec(predec)
         , postdec(postdec)
     {}
@@ -122,6 +126,7 @@ struct any_iterator_ops<ValueType, std::random_access_iterator_tag> : any_iterat
     using typename base::assign_t;
     using typename base::destroy_t;
     using typename base::deref_t;
+    using typename base::deref_c_t;
     using typename base::preinc_t;
     using typename base::postinc_t;
     using typename base::eq_t;
@@ -143,13 +148,13 @@ struct any_iterator_ops<ValueType, std::random_access_iterator_tag> : any_iterat
 
     constexpr any_iterator_ops(copy_t copy, move_t move, assign_t assign,
                                destroy_t destroy,
-                               deref_t deref, preinc_t preinc, postinc_t postinc,
+                               deref_t deref, deref_c_t deref_c, preinc_t preinc, postinc_t postinc,
                                eq_t eq, predec_t predec, postdec_t postdec,
                                add_t add, sub_t sub, diff_t diff, lt_t lt,
                                subscript_t subscript)
         : any_iterator_ops<ValueType, std::bidirectional_iterator_tag>(copy, move, assign,
                                                                        destroy,
-                                                                       deref, preinc, postinc,
+                                                                       deref, deref_c, preinc, postinc,
                                                                        eq, predec, postdec)
         , add(add)
         , sub(sub)
@@ -173,6 +178,12 @@ void null_assign(any_iterator_ops<ValueType, std::forward_iterator_tag> const* d
 
 void null_destroy(small_storage_type&)
 {}
+
+template <typename ValueType>
+const ValueType& null_deref_c(small_storage_type const&)
+{
+    throw bad_any_iterator();
+}
 
 template <typename ValueType>
 ValueType& null_deref(small_storage_type const&)
@@ -242,6 +253,7 @@ inline any_iterator_ops<ValueType, std::random_access_iterator_tag> const* make_
         &null_destroy,
 
         &null_deref<ValueType>,
+        &null_deref_c<ValueType>,
         &null_preinc,
         &null_postinc,
 
@@ -331,6 +343,7 @@ typename std::enable_if<!fits_small_storage<InnerIterator>>::type inner_move(sma
     reinterpret_cast<InnerIterator*&>(dst) = reinterpret_cast<InnerIterator*&>(src);
 }
 
+
 template <typename ValueType, typename InnerIterator>
 typename std::enable_if<fits_small_storage<InnerIterator>>::type inner_assign(any_iterator_ops<ValueType, std::forward_iterator_tag> const* dst_ops, small_storage_type& dst, small_storage_type const& src)
 {
@@ -358,11 +371,19 @@ typename std::enable_if<!fits_small_storage<InnerIterator>>::type inner_destroy(
     delete &access<InnerIterator>(obj);
 }
 
+
 template <typename ValueType, typename InnerIterator>
 ValueType& inner_deref(small_storage_type const& obj)
 {
+    return const_cast <ValueType&> (*access<InnerIterator>(obj));
+}
+
+template <typename ValueType, typename InnerIterator>
+const ValueType& inner_deref_c(small_storage_type const& obj)
+{
     return *access<InnerIterator>(obj);
 }
+
 
 template <typename InnerIterator>
 void inner_preinc(small_storage_type& obj)
@@ -439,7 +460,7 @@ bool inner_lt(small_storage_type const& lhs, small_storage_type const& rhs)
 template <typename ValueType, typename InnerIterator>
 ValueType& inner_subscript(small_storage_type const& obj, std::ptrdiff_t n)
 {
-    return access<InnerIterator>(obj)[n];
+    return const_cast <ValueType&> (access<InnerIterator>(obj)[n]);
 }
 
 template <typename ValueType, typename InnerIterator, typename IteratorCategory>
@@ -457,6 +478,7 @@ struct iterator_ops_impl<ValueType, InnerIterator, std::forward_iterator_tag>
             &inner_assign<ValueType, InnerIterator>,
             &inner_destroy<InnerIterator>,
             &inner_deref<ValueType, InnerIterator>,
+            &inner_deref_c<ValueType, InnerIterator>,
             &inner_preinc<InnerIterator>,
             &inner_postinc<InnerIterator>,
             &inner_eq<InnerIterator>
@@ -476,6 +498,7 @@ struct iterator_ops_impl<ValueType, InnerIterator, std::bidirectional_iterator_t
             &inner_assign<ValueType, InnerIterator>,
             &inner_destroy<InnerIterator>,
             &inner_deref<ValueType, InnerIterator>,
+            &inner_deref_c<ValueType, InnerIterator>,
             &inner_preinc<InnerIterator>,
             &inner_postinc<InnerIterator>,
             &inner_eq<InnerIterator>,
@@ -497,6 +520,7 @@ struct iterator_ops_impl<ValueType, InnerIterator, std::random_access_iterator_t
             &inner_assign<ValueType, InnerIterator>,
             &inner_destroy<InnerIterator>,
             &inner_deref<ValueType, InnerIterator>,
+            &inner_deref_c<ValueType, InnerIterator>,
             &inner_preinc<InnerIterator>,
             &inner_postinc<InnerIterator>,
             &inner_eq<InnerIterator>,
@@ -522,9 +546,10 @@ any_iterator_ops<ValueType, typename std::iterator_traits<InnerIterator>::iterat
 
 template <typename ValueType, typename InnerIterator>
 any_iterator_ops<ValueType, typename std::iterator_traits<InnerIterator>::iterator_category> const* make_big_iterator_ops();
-
+/*
 template <typename ValueType, typename Category>
 ValueType& operator*(any_iterator<ValueType, Category> const& it);
+*/
 
 template <typename ValueType, typename Category>
 any_iterator<ValueType, Category>& operator++(any_iterator<ValueType, Category>& it);
@@ -672,7 +697,7 @@ struct any_iterator : any_iterator_base<ValueType, Category>
     using reference = ValueType&;
 
     any_iterator() noexcept
-        : ops(make_null_ops<ValueType>())
+        : ops(make_null_ops<std::remove_const_t <ValueType> >())
     {}
 
     template <typename InnerIteratorRef>
@@ -681,13 +706,13 @@ struct any_iterator : any_iterator_base<ValueType, Category>
                      std::is_convertible<typename std::iterator_traits<typename std::decay<InnerIteratorRef>::type>::iterator_category*, Category*>::value
                   && !is_any_iterator<typename std::decay<InnerIteratorRef>::type>::value
                  >::type* = nullptr)
-        : ops(make_inner_iterator_ops<ValueType, typename std::decay<InnerIteratorRef>::type>())
+        : ops(make_inner_iterator_ops<std::remove_const_t <ValueType>, typename std::decay<InnerIteratorRef>::type>())
     {
         inner_construct<typename std::decay<InnerIteratorRef>::type>(stg, std::forward<InnerIteratorRef>(ii));
     }
-
+    
     template <typename OtherCategory>
-    any_iterator(any_iterator<ValueType, OtherCategory> const& other,
+    any_iterator(any_iterator<std::remove_const_t <ValueType>, OtherCategory> const& other,
                  typename std::enable_if<
                      std::is_convertible<OtherCategory*, Category*>::value
                  >::type* = nullptr)
@@ -696,6 +721,18 @@ struct any_iterator : any_iterator_base<ValueType, Category>
         ops->copy(stg, other.stg);
     }
 
+    template <typename OtherCategory>
+    any_iterator(any_iterator<std::remove_const_t <ValueType>, OtherCategory>&& other,
+                 typename std::enable_if<
+                     std::is_convertible<OtherCategory*, Category*>::value
+                 >::type* = nullptr)
+        : ops(other.ops)
+    {
+        ops->move(stg, other.stg);
+        other.ops = make_null_ops<std::remove_const_t <ValueType> >();
+    }
+
+    /*
     template <typename OtherCategory>
     any_iterator(any_iterator<ValueType, OtherCategory>&& other,
                  typename std::enable_if<
@@ -706,6 +743,7 @@ struct any_iterator : any_iterator_base<ValueType, Category>
         ops->move(stg, other.stg);
         other.ops = make_null_ops<ValueType>();
     }
+    */
 
     any_iterator(any_iterator const& other)
         : ops(other.ops)
@@ -717,9 +755,9 @@ struct any_iterator : any_iterator_base<ValueType, Category>
         : ops(other.ops)
     {
         ops->move(stg, other.stg);
-        other.ops = make_null_ops<ValueType>();
+        other.ops = make_null_ops<std::remove_const_t <ValueType> >();
     }
-
+    
     ~any_iterator()
     {
         ops->destroy(stg);
@@ -738,32 +776,47 @@ struct any_iterator : any_iterator_base<ValueType, Category>
         {
             ops->destroy(stg);
             rhs.ops->move(stg, rhs.stg);
-            rhs.ops = make_null_ops<ValueType>();
+            rhs.ops = make_null_ops<std::remove_const_t <ValueType> >();
         }
         return *this;
     }
+
+    ValueType& operator*()
+    {
+        return ops->deref(stg);
+    }
+
+    const ValueType& operator*() const
+    {
+        return ops->deref_c(stg);
+    }
+
 private:
-    any_iterator_ops<ValueType, Category> const* ops;
+    any_iterator_ops<std::remove_const_t <ValueType>, Category> const* ops;
     small_storage_type stg;
 
     template <typename OtherValueType, typename OtherCategory>
     friend struct any_iterator;
     friend struct any_iterator_base<ValueType, Category>;
-    friend ValueType& operator*<>(any_iterator<ValueType, Category> const&);
+
+    //friend ValueType& operator*<>(any_iterator<ValueType, Category> const&);
+
+
+    
     friend any_iterator& operator++<>(any_iterator& it);
     friend any_iterator operator++<>(any_iterator& it, int);
     friend bool operator==<>(any_iterator const& lhs, any_iterator const& rhs);
     template <typename T, typename category, template <typename> typename container> 
     friend typename container <T> :: iterator const & get_iter(any_iterator <T, category> const & a);
+    template <typename T, typename category, template <typename> typename container> 
+    friend typename container <T> :: iterator const & get_iter(any_iterator <const T, category> const & a);
     template <typename T, typename category, typename typeIter> //TODO FIXME check kek mem
     friend bool check (any_iterator<T, category> const & a);
+    template <typename T, typename category, typename typeIter> //TODO FIXME check kek mem
+    friend bool check (any_iterator<const T, category> const & a);
 };
 
-template <typename ValueType, typename Category>
-ValueType& operator*(any_iterator<ValueType, Category> const& it)
-{
-    return it.ops->deref(it.stg);
-}
+
 
 template <typename ValueType, typename Category>
 any_iterator<ValueType, Category>& operator++(any_iterator<ValueType, Category>& it)
@@ -913,8 +966,17 @@ typename std::enable_if<
     return it;
 }
 
+template <typename ValueType, typename Category>
+using any_const_iterator = any_iterator_impl::any_iterator <const ValueType, Category>;
+
 template <typename T, typename category, template <typename> typename container> 
 typename container <T> :: iterator const & get_iter(any_iterator <T, category> const & a)
+{
+    return any_iterator_impl::access <typename container <T> :: iterator> (a.stg);
+}
+
+template <typename T, typename category, template <typename> typename container> 
+typename container <T> :: iterator const & get_iter(any_const_iterator <T, category> const & a)
 {
     return any_iterator_impl::access <typename container <T> :: iterator> (a.stg);
 }
@@ -925,11 +987,17 @@ bool check (any_iterator<T, category> const & a)
     return (a.ops->copy == & inner_copy <typeIter>);
 }
 
+template <typename T, typename category, typename typeIter> //TODO FIXME check kek mem
+bool check (any_const_iterator<T, category> const & a) 
+{
+    return (a.ops->copy == & inner_copy <typeIter>);
+}
 
 }
 
 using any_iterator_impl::bad_any_iterator;
 using any_iterator_impl::any_iterator;
+using any_iterator_impl::any_const_iterator;
 
 template <typename ValueType>
 using any_forward_iterator = any_iterator<ValueType, std::forward_iterator_tag>;

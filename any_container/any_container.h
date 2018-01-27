@@ -15,13 +15,13 @@ struct null_container
 
 
 template <typename T, typename category > 
-const any_iterator <const T, category> null_cend   (small_storage const & storage)
+any_const_iterator <T, category> null_cend   (small_storage const & storage)
 {
     throw;
 }
 
 template <typename T, typename category > 
-const any_iterator <const T, category> null_cbegin   (small_storage const & storage)
+any_const_iterator <T, category> null_cbegin   (small_storage const & storage)
 {
     throw;
 }
@@ -39,19 +39,19 @@ any_iterator <T, category> null_begin   (small_storage & storage)
 }
 
 template <typename T, typename category > 
-any_iterator <T, category> null_erase  (small_storage & storage, any_iterator <T, category> to)
+any_iterator <T, category> null_erase  (small_storage & storage, any_const_iterator <T, category> to)
 {
     throw;
 }
 
 template <typename T, typename category > 
-any_iterator <T, category> null_insert_r  (small_storage & storage, T && a, any_iterator <T, category> to)
+any_iterator <T, category> null_insert_r  (small_storage & storage, T && a, any_const_iterator <T, category> to)
 {
     throw;
 }
 
 template <typename T, typename category > 
-any_iterator <T, category> null_insert  (small_storage & storage, T const & a, any_iterator <T, category> to)
+any_iterator <T, category> null_insert  (small_storage & storage, T const & a, any_const_iterator <T, category> to)
 {
     throw;
 }
@@ -86,13 +86,13 @@ void null_copy   (small_storage & to, small_storage const & from)
 template <typename T, typename category> 
 struct func_stor
 {
-    using cend__t = const any_iterator <const T, category> (*) (small_storage const & storage);
-    using cbegin__t = const any_iterator <const T, category> (*) (small_storage const & storage);
+    using cend__t = any_const_iterator <T, category> (*) (small_storage const & storage);
+    using cbegin__t = any_const_iterator <T, category> (*) (small_storage const & storage);
     using end__t = any_iterator <T, category> (*) (small_storage & storage);
     using begin__t = any_iterator <T, category> (*) (small_storage & storage);
-    using erase__t = any_iterator <T, category> (*) (small_storage & storage, any_iterator <T, category> to);
-    using insert__t = any_iterator <T, category> (*) (small_storage & storage, T const & a, any_iterator <T, category> to);
-    using insert_r__t = any_iterator <T, category> (*) (small_storage & storage, T && a, any_iterator <T, category> to);
+    using erase__t = any_iterator <T, category> (*) (small_storage & storage, any_const_iterator <T, category> to);
+    using insert__t = any_iterator <T, category> (*) (small_storage & storage, T const & a, any_const_iterator <T, category> to);
+    using insert_r__t = any_iterator <T, category> (*) (small_storage & storage, T && a, any_const_iterator <T, category> to);
     using size__t = size_t (*) (small_storage const & storage);
     using empty__t = bool (*) (small_storage const & storage);
     using destroy__t = void (*) (small_storage & storage);
@@ -300,11 +300,11 @@ struct any_container
     {
         return ops->size_e(storage);
     }
-    const any_iterator <const T, category> cbegin () const 
+    any_const_iterator <T, category> cbegin () const 
     {
         return ops->cbegin_e(storage);
     }
-    const any_iterator <const T, category> cend () const 
+    any_const_iterator <T, category> cend () const 
     {
         return ops->cend_e(storage);
     }
@@ -316,15 +316,15 @@ struct any_container
     {
         return ops->end_e(storage);
     }
-    any_iterator <T, category> erase (any_iterator <T, category> to)
+    any_iterator <T, category> erase (any_const_iterator <T, category> to)
     {
         return ops->erase_e (storage, to);
     }
-    any_iterator <T, category> insert(any_iterator <T, category> to, T const & a)
+    any_iterator <T, category> insert(any_const_iterator <T, category> to, T const & a)
     {
         return ops->insert_e (storage, std::move(a), to);
     }
-    any_iterator <T, category> insert(any_iterator <T, category> to, T && a)
+    any_iterator <T, category> insert(any_const_iterator <T, category> to, T && a)
     {
         return ops->insert_re (storage, std::move(a), to);
     }
