@@ -12,48 +12,51 @@ template <typename T>
 struct null_container
 {};
 
-
+struct bad_container : std::runtime_error
+{
+    using std::runtime_error :: runtime_error ;
+};
 
 template <typename T, typename category > 
 any_const_iterator <T, category> null_cend   (small_storage const & storage)
 {
-    throw;
+    throw bad_container();
 }
 
 template <typename T, typename category > 
 any_const_iterator <T, category> null_cbegin   (small_storage const & storage)
 {
-    throw;
+    throw bad_container();
 }
 
 template <typename T, typename category > 
 any_iterator <T, category> null_end   (small_storage & storage)
 {
-    throw;
+    throw bad_container();
 }
 
 template <typename T, typename category > 
 any_iterator <T, category> null_begin   (small_storage & storage)
 {
-    throw;
+    throw bad_container();
 }
 
 template <typename T, typename category > 
 any_iterator <T, category> null_erase  (small_storage & storage, any_const_iterator <T, category> to)
 {
-    throw;
+    throw bad_container();
 }
 
 template <typename T, typename category > 
 any_iterator <T, category> null_insert_r  (small_storage & storage, T && a, any_const_iterator <T, category> to)
 {
-    throw;
+    throw bad_container();
 }
 
 template <typename T, typename category > 
 any_iterator <T, category> null_insert  (small_storage & storage, T const & a, any_const_iterator <T, category> to)
 {
-    throw;
+    throw bad_container();
 }
 
 template <typename T, typename category > 
@@ -197,7 +200,7 @@ std::enable_if_t <((is_small <container <T> >) && (std::is_copy_constructible_v 
 template <typename T, template <typename> typename container> //TODO
 std::enable_if_t <!std::is_copy_constructible_v <T> > make (small_storage & storage, container <T> const & a)
 {
-    throw;
+    throw bad_container();
 }
 
 template <typename T, template <typename> typename container> //TODO
